@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>안심 귀가 호출 - 사용 설명서</title>
+    <style>
+        body {
+            font-family: 'Malgun Gothic', 'Noto Sans KR', sans-serif;
+            background-color: #f8fafc;
+            color: #334155;
+            margin: 0;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+        }
+        .container {
+            width: 100%;
+            max-width: 700px;
+            background-color: #ffffff;
+            border-radius: 24px;
+            padding: 40px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.04);
+            border: 1px solid #e2e8f0;
+        }
+        h1 {
+            color: #ea580c;
+            font-size: 28px;
+            border-bottom: 3px solid #f97316;
+            padding-bottom: 14px;
+            margin-top: 0;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        h2 {
+            color: #1e293b;
+            font-size: 20px;
+            margin-top: 36px;
+            border-left: 5px solid #f97316;
+            padding-left: 12px;
+        }
+        .link-box {
+            background-color: #fff7ed;
+            border: 2px dashed #f97316;
+            border-radius: 16px;
+            padding: 24px;
+            text-align: center;
+            margin: 24px 0 36px 0;
+        }
+        .link-box a {
+            display: inline-block;
+            background-color: #f97316;
+            color: white;
+            padding: 14px 32px;
+            border-radius: 10px;
+            text-decoration: none;
+            font-weight: bold;
+            font-size: 18px;
+            transition: background-color 0.2s, transform 0.2s;
+            box-shadow: 0 4px 12px rgba(249, 115, 22, 0.2);
+        }
+        .link-box a:hover {
+            background-color: #ea580c;
+            transform: translateY(-2px);
+        }
+        .path-text {
+            font-family: Consolas, monospace;
+            background-color: #f1f5f9;
+            padding: 10px 14px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            display: block;
+            margin-top: 12px;
+            font-size: 13px;
+            word-break: break-all;
+            color: #475569;
+        }
+        ul, ol {
+            padding-left: 24px;
+            line-height: 1.8;
+        }
+        li {
+            margin-bottom: 10px;
+        }
+        .tip-box {
+            background-color: #f8fafc;
+            padding: 20px;
+            border-left: 4px solid #3b82f6;
+            border-radius: 8px;
+            font-size: 14px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+        .key-text {
+            font-weight: bold;
+            background-color: #f1f5f9;
+            padding: 2px 6px;
+            border: 1px solid #cbd5e1;
+            border-radius: 4px;
+            font-family: Consolas, monospace;
+            font-size: 13px;
+        }
+        .role-badge {
+            font-size: 11px;
+            font-weight: bold;
+            padding: 2px 8px;
+            border-radius: 20px;
+            color: white;
+        }
+        .badge-parent { background-color: #f97316; }
+        .badge-child { background-color: #3b82f6; }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>📢 안심 귀가 호출 사용 설명서</h1>
+
+    <!-- 1. 앱 실행 링크 -->
+    <div class="link-box">
+        <p style="margin-top:0; font-weight:bold; color: #7c2d12; font-size:16px;">아래 버튼을 클릭하여 바로 서비스를 실행해 보세요!</p>
+        <a href="index.html" target="_blank">👉 안심 귀가 호출 실행하기</a>
+        <p style="font-size: 13px; color: #64748b; margin-bottom: 0; margin-top: 16px;">
+            (또는 동일 폴더 안의 <b>index.html</b> 파일을 웹 브라우저로 직접 실행하셔도 됩니다.)
+        </p>
+        <span class="path-text">실행 파일 경로: c:/Users/kikin/Projects/antigravity-app/index.html</span>
+    </div>
+
+    <!-- 2. 기획 목적 -->
+    <h2>1. 안심 귀가 호출이란?</h2>
+    <p style="line-height:1.7;">
+        본 서비스는 부모님(시니어)의 위치 파악 및 택시 호출 결제에 따르는 디지털 진입 장벽을 완전히 극복하기 위해 설계된 <b>대리 호출 브릿지 플랫폼</b>입니다.<br>
+        직접 복잡한 앱을 이용해 예약을 완료할 필요 없이, <b>"버튼 터치 단 한 번"</b>으로 자녀의 스마트폰이나 PC 관제 창에 위성 GPS 지도를 전송하여 자녀가 안전하게 택시를 대신 예약하고 결제할 수 있도록 도와줍니다.
+    </p>
+
+    <!-- 3. 핵심 기능 소개 -->
+    <h2>2. 대상 및 역할 구분</h2>
+    <ul>
+        <li><b>👵 부모님용 화면 <span class="role-badge badge-parent">부모용</span></b>
+            <ul>
+                <li>대형 무입력(Zero-Typing) 위치 전송 버튼.</li>
+                <li>오작동 방지 및 명확한 시각 안내 피드백.</li>
+                <li><b>위치 차단 시 대체 수단</b>: GPS 차단 시 네트워크 기지국 기반 위치 전송과 자녀 비상 다이렉트 전화(tel 링크) 연결 화면 제공.</li>
+            </ul>
+        </li>
+        <li><b>🧑‍💻 자녀용 화면 <span class="role-badge badge-child">자녀 관제용</span></b>
+            <ul>
+                <li>실시간 부모님 위치 지도 마킹 및 상세 주소(도로명/지번) 역지오코딩.</li>
+                <li>브라우저 3화음 알림벨 소리 및 OS 데스크톱 알림 팝업.</li>
+                <li>카카오 T 앱 자동 연동 링크, 카카오맵 길찾기 연동 링크 및 주소 복사 기능.</li>
+            </ul>
+        </li>
+    </ul>
+
+    <!-- 4. 상세 사용법 및 설정 -->
+    <h2>3. 최초 설정 및 사용 방법</h2>
+    
+    <h3>⚙️ 카카오맵 및 무선 브릿지 연동 설정 (최초 1회)</h3>
+    <ol>
+        <li>서비스 우측 상단의 <b>⚙️ 톱니바퀴 아이콘</b>을 클릭합니다.</li>
+        <li>자신이 발급받은 <span class="key-text">카카오맵 JavaScript API Key</span>를 입력해 줍니다.</li>
+        <li>자녀에게 다이렉트 전화를 걸기 위한 <span class="key-text">자녀 연락처</span>(예: 01012345678)를 입력합니다.</li>
+        <li>기기 간 무선 연동을 위해 고유한 <span class="key-text">브릿지 연동 토픽 ID</span>를 설정합니다. (양쪽 기기가 동일한 토픽 ID여야 함)</li>
+        <li>부모님이 자주 가시는 <span class="key-text">목적지 정보</span>(예: 이름 '집' / 주소 '서울시 마포구...')를 최대 5곳까지 입력하고 저장합니다.</li>
+    </ol>
+    
+    <div class="tip-box">
+        <b>💡 카카오 API 키가 없는 경우에도 테스트할 수 있나요?</b><br>
+        네, 가능합니다! API 키가 없어도 무료 전역 주소 API(Nominatim)가 자동으로 동작하여 부모님의 한글 주소와 위도/경도가 자녀 대시보드에 정상적으로 전송되며, 지도만 텍스트 정보로 대체됩니다. 데모 듀얼 뷰를 열어 즉시 작동을 시험해 보세요.
+    </div>
+
+    <h3>👵 부모님 이용 흐름 (전화 통화 & 목적지 원터치)</h3>
+    <ul>
+        <li><b>위치 정보만 보내기</b>:
+            <ol>
+                <li>상단의 거대한 <b>[📢 위치전송]</b> 버튼을 누릅니다.</li>
+                <li>위치 수집이 끝나면 화면에 "위치 전송 완료!" 팝업이 나타나며, **[이전 화면으로]** 버튼을 터치해 다시 첫 화면으로 복귀합니다.</li>
+            </ol>
+        </li>
+        <li><b>목적지 선택하여 전송 (시나리오 B)</b>:
+            <ol>
+                <li>중앙에 노출된 5가지 목적지 단추(예: <b>[🏠 집으로]</b>, <b>[👵 복지관으로]</b>, <b>[👧 딸래미집으로]</b> 등) 중 하나를 직접 터치합니다.</li>
+                <li>위치와 도착지가 자녀 화면에 한 번에 전달됩니다.</li>
+            </ol>
+        </li>
+        <li><b>자녀에게 전화해서 위치 알려주기 (시나리오 A)</b>:
+            <ol>
+                <li>첫 화면 최하단에 상시 배치된 초록색 <b>[📞 자녀에게 전화해서 위치를 알려주세요]</b> 대형 버튼을 누릅니다.</li>
+                <li>자녀에게 전화를 걸어 출발지와 가고 싶은 상세 목적지를 목소리로 대화하며 택시 호출을 요청합니다.</li>
+            </ol>
+        </li>
+    </ul>
+
+    <h3>🧑‍💻 자녀 이용 흐름</h3>
+    <ol>
+        <li>자녀용 화면을 열어둡니다. (또는 듀얼 데모 뷰 사용)</li>
+        <li>부모님이 요청을 보내면 자녀 화면에 <b>경고 사운드(C-E-G 화음)</b>가 재생되며 데스크톱 알림창이 나타납니다.</li>
+        <li><b>배차하기</b>:
+            <ul>
+                <li>부모님이 시나리오 A로 보냈다면: <b>[📋 출발 복사]</b>를 눌러 주소를 복사하고 전화를 받아 목적지를 파악한 후 호출합니다.</li>
+                <li>부모님이 시나리오 B로 보냈다면: <b>[📋 출발 복사]</b> 및 <b>[📋 도착 복사]</b>를 각각 클릭하여 카카오 T에 출발지와 목적지 주소를 입력합니다.</li>
+            </ul>
+        </li>
+        <li><b>원격 목적지 주소 설정 및 동기화</b>:
+            <ul>
+                <li>자녀 화면 우측의 [부모님 목적지 동기화 설정] 패널에서 5개의 목적지 주소를 입력하고 <b>[변경사항 부모님께 동기화]</b>를 누르면, 인터넷 망을 통하여 부모님의 기기 화면에 새로운 목적지 버튼이 실시간으로 자동 업데이트됩니다.</li>
+            </ul>
+        </li>
+        <li><b>[🗺️ 카카오맵]</b> 버튼을 클릭하면, 부모님 위치(출발지)와 목적지(도착지)가 모두 지정된 카카오맵 길찾기 웹 화면이 자동으로 열려 전체 경로를 쉽게 확인하고 길안내를 받을 수 있습니다.</li>
+    </ol>
+</div>
+
+</body>
+</html>

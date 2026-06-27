@@ -1,0 +1,2664 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>안심 귀가 호출 - 시니어 모빌리티 브릿지</title>
+    <!-- Google Fonts: Outfit (English numbers/titles) & Noto Sans KR (Korean text) -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+KR:wght@300;400;500;700;900&family=Outfit:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <style>
+        /* Design Tokens & Theme Variables */
+        :root {
+            /* General Fonts */
+            --font-main: 'Noto Sans KR', sans-serif;
+            --font-number: 'Outfit', sans-serif;
+
+            /* Parent View Theme (Warm Cream, Peach, and High Contrast Orange) */
+            --bg-parent: #FDFBF7;
+            --card-parent: #FFFFFF;
+            --primary-parent: #FF6B35;
+            --primary-parent-hover: #E85A24;
+            --primary-parent-rgb: 255, 107, 53;
+            --text-parent: #2E1F1A;
+            --text-parent-muted: #6B5E59;
+            --border-parent: #F3ECE0;
+
+            /* Child View Theme (Sleek Dark Mode, Deep Charcoal and Accent Blue) */
+            --bg-child: #0D1117;
+            --card-child: #161B22;
+            --primary-child: #58A6FF;
+            --primary-child-hover: #1F6FEB;
+            --primary-child-rgb: 88, 166, 255;
+            --text-child: #C9D1D9;
+            --text-child-muted: #8B949E;
+            --border-child: #30363D;
+
+            /* Utility Colors */
+            --danger: #FF4D4F;
+            --success: #52C41A;
+            --warning: #FAAD14;
+            --white: #FFFFFF;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        /* Reset & Base Styles */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+            font-family: var(--font-main);
+        }
+
+        body {
+            background-color: #F0F2F5;
+            color: #333333;
+            min-height: 100vh;
+            overflow-x: hidden;
+        }
+
+        /* View Containers (Router Simulation) */
+        .view-section {
+            display: none;
+            min-height: 100vh;
+            width: 100%;
+        }
+
+        .view-active {
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* Header Style */
+        header {
+            width: 100%;
+            padding: 16px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+
+        .logo {
+            font-size: 20px;
+            font-weight: 800;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            cursor: pointer;
+        }
+
+        .logo span.badge {
+            font-size: 11px;
+            padding: 2px 6px;
+            border-radius: 20px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+            text-transform: uppercase;
+        }
+
+        .header-actions {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+        }
+
+        .btn-circle {
+            width: 44px;
+            height: 44px;
+            border-radius: 50%;
+            border: 1px solid #E2E8F0;
+            background: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            font-size: 20px;
+            transition: var(--transition);
+            box-shadow: 0 2px 4px rgba(0,0,0,0.02);
+        }
+
+        .btn-circle:hover {
+            transform: scale(1.05);
+            background: #EDF2F7;
+        }
+
+        /* ========================================================
+           1. HOME VIEW (ROLE SELECTOR)
+           ======================================================== */
+        #view-home {
+            justify-content: center;
+            align-items: center;
+            padding: 40px 20px;
+            background: radial-gradient(circle at 50% 50%, #ECEFF1 0%, #CFD8DC 100%);
+        }
+
+        .home-container {
+            max-width: 900px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .home-title {
+            font-size: 36px;
+            font-weight: 900;
+            color: #1A202C;
+            margin-bottom: 12px;
+            letter-spacing: -0.5px;
+        }
+
+        .home-subtitle {
+            font-size: 16px;
+            color: #4A5568;
+            margin-bottom: 40px;
+        }
+
+        .role-cards {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+            gap: 24px;
+            margin-bottom: 40px;
+        }
+
+        .role-card {
+            background: white;
+            border-radius: 24px;
+            padding: 36px 24px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.05);
+            cursor: pointer;
+            transition: var(--transition);
+            border: 2px solid transparent;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .role-card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 20px 35px rgba(0,0,0,0.08);
+        }
+
+        .role-card.parent-card:hover {
+            border-color: var(--primary-parent);
+        }
+
+        .role-card.child-card:hover {
+            border-color: var(--primary-child);
+        }
+
+        .role-card.dual-card:hover {
+            border-color: var(--warning);
+        }
+
+        .role-icon {
+            font-size: 64px;
+            margin-bottom: 20px;
+        }
+
+        .role-name {
+            font-size: 22px;
+            font-weight: 700;
+            color: #1A202C;
+            margin-bottom: 12px;
+        }
+
+        .role-desc {
+            font-size: 14px;
+            color: #718096;
+            line-height: 1.6;
+        }
+
+        /* ========================================================
+           2. PARENT VIEW (SENIOR)
+           ======================================================== */
+        #view-parent {
+            background-color: var(--bg-parent);
+            color: var(--text-parent);
+        }
+
+        #view-parent header {
+            background: var(--card-parent);
+            border-bottom: 1px solid var(--border-parent);
+        }
+
+        #view-parent .logo {
+            color: var(--primary-parent);
+        }
+
+        #view-parent .logo span.badge {
+            background: var(--primary-parent);
+            color: white;
+        }
+
+        .parent-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 24px;
+            text-align: center;
+            max-width: 600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        .parent-instruction {
+            font-size: 26px;
+            font-weight: 900;
+            line-height: 1.4;
+            color: var(--text-parent);
+            margin-bottom: 40px;
+            word-break: keep-all;
+        }
+
+        /* Massive Touch Button */
+        .big-call-btn {
+            width: 250px;
+            height: 250px;
+            border-radius: 50%;
+            background: var(--primary-parent);
+            color: white;
+            border: 15px solid rgba(255, 107, 53, 0.15);
+            font-size: 28px;
+            font-weight: 900;
+            cursor: pointer;
+            box-shadow: 0 20px 40px rgba(255, 107, 53, 0.3);
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            position: relative;
+            transition: all 0.2s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            outline: none;
+            user-select: none;
+        }
+
+        .big-call-btn:active {
+            transform: scale(0.93);
+            box-shadow: 0 10px 20px rgba(255, 107, 53, 0.2);
+            border-color: rgba(255, 107, 53, 0.3);
+        }
+
+        /* Pulsing circle effect behind button */
+        .big-call-btn::after {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            border-radius: 50%;
+            border: 2px solid var(--primary-parent);
+            animation: pulse-ring 2s infinite;
+            pointer-events: none;
+            opacity: 0.8;
+        }
+
+        @keyframes pulse-ring {
+            0% { transform: scale(1); opacity: 0.8; }
+            100% { transform: scale(1.4); opacity: 0; }
+        }
+
+        .btn-subtext {
+            font-size: 14px;
+            font-weight: 500;
+            opacity: 0.9;
+            background: rgba(0, 0, 0, 0.15);
+            padding: 4px 12px;
+            border-radius: 12px;
+        }
+
+        .parent-footer-text {
+            font-size: 16px;
+            color: var(--text-parent-muted);
+            margin-top: 40px;
+            line-height: 1.6;
+            word-break: keep-all;
+        }
+
+        /* Parent Loader & Success Animations */
+        .parent-status-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(253, 251, 247, 0.95);
+            z-index: 1000;
+            display: none;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 24px;
+        }
+
+        .spinner {
+            width: 80px;
+            height: 80px;
+            border: 8px solid rgba(255, 107, 53, 0.1);
+            border-top: 8px solid var(--primary-parent);
+            border-radius: 50%;
+            animation: spin 1s linear infinite;
+            margin-bottom: 24px;
+        }
+
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+
+        .success-checkmark {
+            width: 80px;
+            height: 80px;
+            border-radius: 50%;
+            background: var(--success);
+            color: white;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 40px;
+            margin-bottom: 24px;
+            animation: scale-up 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes scale-up {
+            0% { transform: scale(0.5); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .status-title {
+            font-size: 26px;
+            font-weight: 800;
+            color: var(--text-parent);
+            margin-bottom: 12px;
+            word-break: keep-all;
+        }
+
+        .status-desc {
+            font-size: 16px;
+            color: var(--text-parent-muted);
+            max-width: 400px;
+            line-height: 1.6;
+            word-break: keep-all;
+        }
+
+        /* ========================================================
+           3. CHILD VIEW (GUARDIAN DASHBOARD)
+           ======================================================== */
+        #view-child {
+            background-color: var(--bg-child);
+            color: var(--text-child);
+        }
+
+        #view-child header {
+            background: var(--card-child);
+            border-bottom: 1px solid var(--border-child);
+        }
+
+        #view-child .logo {
+            color: var(--primary-child);
+        }
+
+        #view-child .logo span.badge {
+            background: var(--primary-child);
+            color: #0D1117;
+        }
+
+        .child-dashboard {
+            flex: 1;
+            display: grid;
+            grid-template-columns: 1fr 400px;
+            gap: 20px;
+            padding: 24px;
+            max-width: 1600px;
+            margin: 0 auto;
+            width: 100%;
+        }
+
+        @media (max-width: 992px) {
+            .child-dashboard {
+                grid-template-columns: 1fr;
+            }
+        }
+
+        /* Left Side: Map & Deep link */
+        .map-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .map-wrapper {
+            background: var(--card-child);
+            border: 1px solid var(--border-child);
+            border-radius: 20px;
+            height: 450px;
+            width: 100%;
+            position: relative;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
+
+        #kakao-map-container {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            top: 0;
+            left: 0;
+            z-index: 1;
+        }
+
+        /* Custom Map Overlay if API key missing */
+        .map-fallback {
+            z-index: 2;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(22, 27, 34, 0.95);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 40px;
+            text-align: center;
+            border-radius: 20px;
+        }
+
+        .map-fallback-icon {
+            font-size: 48px;
+            color: var(--warning);
+            margin-bottom: 16px;
+        }
+
+        .map-fallback-title {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        .map-fallback-desc {
+            font-size: 13px;
+            color: var(--text-child-muted);
+            max-width: 400px;
+            line-height: 1.6;
+            margin-bottom: 20px;
+        }
+
+        /* Action Panel (Kakao T integration) */
+        .action-panel {
+            background: var(--card-child);
+            border: 1px solid var(--border-child);
+            border-radius: 20px;
+            padding: 24px;
+            display: flex;
+            flex-direction: column;
+            gap: 16px;
+        }
+
+        .panel-title {
+            font-size: 18px;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .btn-large {
+            width: 100%;
+            padding: 16px;
+            border-radius: 12px;
+            font-size: 16px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            transition: var(--transition);
+        }
+
+        .btn-kakaot {
+            background: #FEE500;
+            color: #191919;
+        }
+
+        .btn-kakaot:hover {
+            background: #E6CE00;
+            transform: translateY(-2px);
+        }
+
+        .btn-kakaomap {
+            background: #2D68FF;
+            color: #FFFFFF;
+        }
+
+        .btn-kakaomap:hover {
+            background: #1A53E0;
+            transform: translateY(-2px);
+        }
+
+        .btn-copy {
+            background: var(--primary-child);
+            color: #0D1117;
+        }
+
+        .btn-copy:hover {
+            background: var(--primary-child-hover);
+            transform: translateY(-2px);
+        }
+
+        /* Right Side: Log & Details */
+        .detail-section {
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+
+        .info-card {
+            background: var(--card-child);
+            border: 1px solid var(--border-child);
+            border-radius: 20px;
+            padding: 24px;
+        }
+
+        .info-label {
+            font-size: 12px;
+            color: var(--text-child-muted);
+            text-transform: uppercase;
+            letter-spacing: 0.8px;
+            margin-bottom: 8px;
+        }
+
+        .info-value {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--text-child);
+            line-height: 1.4;
+            word-break: keep-all;
+        }
+
+        .info-value.address-highlight {
+            font-size: 22px;
+            color: var(--white);
+            margin-bottom: 8px;
+        }
+
+        .source-badge {
+            display: inline-flex;
+            align-items: center;
+            gap: 6px;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 12px;
+            font-weight: 700;
+            margin-top: 8px;
+        }
+
+        .source-gps {
+            background: rgba(82, 196, 26, 0.15);
+            color: var(--success);
+            border: 1px solid rgba(82, 196, 26, 0.3);
+        }
+
+        .source-ip {
+            background: rgba(250, 173, 20, 0.15);
+            color: var(--warning);
+            border: 1px solid rgba(250, 173, 20, 0.3);
+        }
+
+        .log-list {
+            list-style: none;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            max-height: 250px;
+            overflow-y: auto;
+            padding-right: 4px;
+        }
+
+        .log-item {
+            padding: 12px 16px;
+            border-radius: 12px;
+            background: rgba(255, 255, 255, 0.02);
+            border: 1px solid var(--border-child);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .log-item:hover {
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        .log-item.active {
+            border-color: var(--primary-child);
+            background: rgba(88, 166, 255, 0.08);
+        }
+
+        .log-time {
+            font-family: var(--font-number);
+            color: var(--text-child-muted);
+            font-size: 11px;
+        }
+
+        /* ========================================================
+           4. DUAL VIEW (SPLIT-SCREEN DEMO)
+           ======================================================== */
+        #view-dual {
+            background-color: #E2E8F0;
+            height: 100vh;
+            display: none;
+            flex-direction: column;
+        }
+
+        #view-dual.view-active {
+            display: flex;
+        }
+
+        .dual-header {
+            background: #1E293B;
+            color: white;
+            padding: 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .dual-logo {
+            font-size: 18px;
+            font-weight: 800;
+            color: #38BDF8;
+        }
+
+        .dual-container {
+            display: flex;
+            flex: 1;
+            overflow: hidden;
+            width: 100%;
+        }
+
+        @media (max-width: 900px) {
+            .dual-container {
+                flex-direction: column;
+            }
+            .dual-pane {
+                height: 50% !important;
+                width: 100% !important;
+            }
+        }
+
+        .dual-pane {
+            width: 50%;
+            height: 100%;
+            overflow-y: auto;
+            position: relative;
+            border-right: 2px solid #CBD5E1;
+        }
+
+        .dual-pane:last-child {
+            border-right: none;
+        }
+
+        .dual-pane-label {
+            position: absolute;
+            top: 76px;
+            right: 20px;
+            z-index: 99;
+            background: rgba(0,0,0,0.7);
+            color: white;
+            padding: 4px 10px;
+            border-radius: 6px;
+            font-size: 11px;
+            font-weight: 700;
+            letter-spacing: 0.5px;
+        }
+
+        /* ========================================================
+           MODALS & DIALOGS
+           ======================================================== */
+        .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.6);
+            backdrop-filter: blur(4px);
+            z-index: 1000;
+            display: none;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .modal-card {
+            background: white;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 480px;
+            box-shadow: 0 20px 40px rgba(0, 0, 0, 0.2);
+            overflow: hidden;
+            animation: modal-enter 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+        }
+
+        @keyframes modal-enter {
+            0% { transform: scale(0.9); opacity: 0; }
+            100% { transform: scale(1); opacity: 1; }
+        }
+
+        .modal-header {
+            padding: 24px 24px 12px 24px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #F1F5F9;
+        }
+
+        .modal-title {
+            font-size: 20px;
+            font-weight: 800;
+            color: #1E293B;
+        }
+
+        .modal-body {
+            padding: 24px;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .modal-footer {
+            padding: 16px 24px 24px 24px;
+            display: flex;
+            justify-content: flex-end;
+            gap: 12px;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            font-size: 14px;
+            font-weight: 700;
+            color: #475569;
+            margin-bottom: 8px;
+        }
+
+        .form-control {
+            width: 100%;
+            padding: 14px 16px;
+            border-radius: 12px;
+            border: 2px solid #E2E8F0;
+            font-size: 15px;
+            transition: var(--transition);
+        }
+
+        .form-control:focus {
+            outline: none;
+            border-color: #3B82F6;
+        }
+
+        .btn {
+            padding: 12px 20px;
+            border-radius: 10px;
+            font-size: 15px;
+            font-weight: 700;
+            border: none;
+            cursor: pointer;
+            transition: var(--transition);
+        }
+
+        .btn-secondary {
+            background: #F1F5F9;
+            color: #475569;
+        }
+
+        .btn-secondary:hover {
+            background: #E2E8F0;
+        }
+
+        .btn-primary {
+            background: #3B82F6;
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background: #2563EB;
+        }
+
+        .btn-orange {
+            background: var(--primary-parent);
+            color: white;
+        }
+
+        .btn-orange:hover {
+            background: var(--primary-parent-hover);
+        }
+
+        .btn-green {
+            background: var(--success);
+            color: white;
+        }
+
+        .btn-green:hover {
+            background: #45a010;
+        }
+
+        /* Pre-permission Explainer Card specific layout */
+        .explainer-illustration {
+            font-size: 64px;
+            text-align: center;
+            margin-bottom: 20px;
+        }
+
+        .explainer-text {
+            font-size: 16px;
+            color: #475569;
+            line-height: 1.6;
+            text-align: center;
+            word-break: keep-all;
+        }
+
+        /* Success dialog inside parent */
+        .gps-fail-modal {
+            text-align: center;
+        }
+        .gps-fail-btn-tel {
+            display: inline-flex;
+            width: 100%;
+            padding: 18px;
+            background: var(--success);
+            color: white;
+            border-radius: 16px;
+            text-decoration: none;
+            font-size: 20px;
+            font-weight: 900;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            box-shadow: 0 10px 20px rgba(82, 196, 26, 0.3);
+            margin-top: 16px;
+            transition: var(--transition);
+        }
+        .gps-fail-btn-tel:hover {
+            background: #45a010;
+            transform: translateY(-2px);
+        }
+
+        /* Toast notifications for child */
+        .notification-toast {
+            position: fixed;
+            top: 24px;
+            right: 24px;
+            background: #1E293B;
+            border-left: 6px solid var(--primary-child);
+            border-radius: 12px;
+            padding: 16px 20px;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.3);
+            z-index: 2000;
+            display: none;
+            align-items: center;
+            gap: 14px;
+            color: white;
+            animation: slide-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            max-width: 380px;
+        }
+
+        @keyframes slide-in {
+            0% { transform: translateY(-50px) scale(0.9); opacity: 0; }
+            100% { transform: translateY(0) scale(1); opacity: 1; }
+        }
+
+        .toast-body {
+            flex: 1;
+        }
+        .toast-title {
+            font-weight: 800;
+            font-size: 15px;
+            margin-bottom: 4px;
+            color: var(--primary-child);
+        }
+        .toast-desc {
+            font-size: 13px;
+            color: #94A3B8;
+        }
+
+        /* Quick destinations buttons for Scenario B */
+        .destinations-quick-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(100px, 1fr));
+            gap: 12px;
+            width: 100%;
+            max-width: 380px;
+            margin: 24px auto;
+        }
+
+        .btn-dest-quick {
+            background: #FFFFFF;
+            border: 2px solid #E2E8F0;
+            border-radius: 16px;
+            padding: 14px 10px;
+            font-size: 15px;
+            font-weight: 800;
+            color: #1E293B;
+            cursor: pointer;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            gap: 6px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02);
+            transition: all 0.2s ease;
+        }
+
+        .btn-dest-quick:hover {
+            border-color: #EA580C;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(234, 88, 12, 0.1);
+        }
+
+        .btn-dest-quick span.icon {
+            font-size: 24px;
+        }
+
+        /* Large Direct Phone Call Button for Parent Screen */
+        .big-call-direct-btn {
+            background: #22C55E;
+            color: #FFFFFF;
+            border: none;
+            border-radius: 24px;
+            width: 100%;
+            max-width: 380px;
+            padding: 20px;
+            font-size: 18px;
+            font-weight: 800;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 12px;
+            box-shadow: 0 10px 20px rgba(34, 197, 94, 0.2);
+            transition: all 0.2s ease;
+            margin: 24px auto 10px auto;
+        }
+
+        .big-call-direct-btn:hover {
+            background: #16A34A;
+            transform: translateY(-2px);
+            box-shadow: 0 12px 24px rgba(22, 163, 74, 0.3);
+        }
+
+        .big-call-direct-btn span {
+            font-size: 24px;
+        }
+
+        .btn-dest-quick span.icon {
+            font-size: 24px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- ========================================================
+       1. HOME VIEW (ROLE SELECTOR)
+       ======================================================== -->
+    <section id="view-home" class="view-section view-active">
+        <div class="home-container">
+            <h1 class="home-title">안심 귀가 호출</h1>
+            <p class="home-subtitle">시니어를 위한 원터치 위치 공유 & 대리 호출 서비스</p>
+            
+            <div class="role-cards">
+                <div class="role-card parent-card" onclick="switchToRole('parent')">
+                    <div class="role-icon">👵</div>
+                    <h2 class="role-name">부모님용 (시니어)</h2>
+                    <p class="role-desc">화면의 커다란 버튼 하나로 내 정밀 위치를 자녀에게 바로 보냅니다. (텍스트 입력 불필요)</p>
+                </div>
+                <div class="role-card child-card" onclick="switchToRole('child')">
+                    <div class="role-icon">🧑‍💻</div>
+                    <h2 class="role-name">자녀용 (보호자)</h2>
+                    <p class="role-desc">부모님의 실시간 위치를 확인하고, 주소를 클립보드에 복사해 카카오 T 등으로 즉시 대리 호출합니다.</p>
+                </div>
+                <div class="role-card dual-card" onclick="switchToRole('dual')">
+                    <div class="role-icon">📱↔️💻</div>
+                    <h2 class="role-name">데모 듀얼 뷰 (테스트)</h2>
+                    <p class="role-desc">좌우로 나뉜 단일 화면에서 부모님의 호출 전송 및 자녀의 실시간 수신 작동을 간편하게 테스트합니다.</p>
+                </div>
+            </div>
+            
+            <button class="btn btn-secondary" onclick="openSettings()">⚙️ 설정창 열기 (카카오 API 키 등록)</button>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+       2. PARENT VIEW (SENIOR)
+       ======================================================== -->
+    <section id="view-parent" class="view-section">
+        <header>
+            <div class="logo" onclick="routeToHome()">
+                🏠 안심 귀가 호출 <span class="badge">부모님용</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn-circle" onclick="openSettings()">⚙️</button>
+            </div>
+        </header>
+
+        <div class="parent-content">
+            <h2 class="parent-instruction">자녀분에게 전화를 걸어<br>데리러 오라고 해볼까요?</h2>
+            
+            <button class="big-call-btn" id="btn-parent-call" onclick="requestParentCall()">
+                <span>📢</span>
+                <span>위치전송</span>
+            </button>
+            
+            <div style="font-size: 14px; font-weight: bold; color: #64748B; margin-top: 20px;">또는 도착지 선택하여 바로 전송하기:</div>
+            <div id="parent-destinations-container" class="destinations-quick-grid"></div>
+
+            <button class="big-call-direct-btn" onclick="makeDirectPhoneCall()">
+                <span>📞</span>
+                <span>자녀에게 전화해서 위치를 알려주세요</span>
+            </button>
+            
+            <p class="parent-footer-text">
+                이 버튼을 누르면 자녀에게 위치를 보내고 전화를 요청합니다.<br>
+                GPS 권한 요청이 뜨면 꼭 <b>[허용]</b>을 선택해 주세요.
+            </p>
+        </div>
+
+        <!-- Parent Geolocation Processing Overlay -->
+        <div class="parent-status-overlay" id="parent-status-overlay">
+            <div class="spinner" id="parent-spinner"></div>
+            <div class="success-checkmark" id="parent-success-icon" style="display:none;">✓</div>
+            <h3 class="status-title" id="parent-status-title">나의 위치를 확인하는 중...</h3>
+            <p class="status-desc" id="parent-status-desc">잠시만 스마트폰을 켜둔 채로 기다려 주세요.</p>
+            <button class="btn btn-secondary" id="btn-parent-cancel" style="margin-top: 24px; display: inline-block;" onclick="cancelParentRequest()">취소</button>
+            <button class="btn btn-orange" id="btn-parent-close" style="margin-top: 24px; display: none; width: 80%; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 12px; border: none; cursor: pointer;" onclick="closeParentOverlay()">이전 화면으로</button>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+       3. CHILD VIEW (GUARDIAN DASHBOARD)
+       ======================================================== -->
+    <section id="view-child" class="view-section">
+        <header>
+            <div class="logo" onclick="routeToHome()">
+                🏠 안심 귀가 호출 <span class="badge">자녀 관제용</span>
+            </div>
+            <div class="header-actions">
+                <button class="btn btn-secondary" onclick="simulateIncomingLocation()">⚡ 가상 호출 테스트</button>
+                <button class="btn-circle" onclick="openSettings()">⚙️</button>
+            </div>
+        </header>
+
+        <div class="child-dashboard">
+            <!-- Left Side: Kakao Map and deep link action buttons -->
+            <div class="map-section">
+                <div class="map-wrapper">
+                    <!-- Dynamic Kakao Map Container -->
+                    <div id="kakao-map-container"></div>
+                    
+                    <!-- Fallback placeholder: Active when Kakao maps is not loaded -->
+                    <div class="map-fallback" id="map-fallback-overlay">
+                        <div class="map-fallback-icon">🗺️</div>
+                        <h4 class="map-fallback-title">실시간 지도 활성화가 필요합니다</h4>
+                        <p class="map-fallback-desc">
+                            우측 상단 톱니바퀴(⚙️) 아이콘을 눌러 본인의 <b>카카오맵 JavaScript App Key</b>를 입력해 주시면 실제 지도가 표시됩니다.<br>
+                            (미설정 시에도 주소 확인 및 기능 테스트는 무료 OpenStreetMap 주소 변환 기능으로 동작합니다.)
+                        </p>
+                        <button class="btn btn-primary" onclick="openSettings()">API 키 설정하러 가기</button>
+                    </div>
+                </div>
+
+                <div class="action-panel">
+                    <h3 class="panel-title">🚖 대리 택시 호출 브릿지</h3>
+                    <p style="font-size:14px; color: var(--text-child-muted); line-height: 1.5;">
+                        부모님의 현 위치 한글 주소를 아래 버튼으로 복사하고 카카오 T 앱으로 연결해 보세요.
+                    </p>
+                    
+                    <button class="btn-large btn-copy" onclick="copyAddressToClipboard()">
+                        📋 주소 복사하기
+                    </button>
+                    <button class="btn-large btn-kakaot" onclick="openKakaoTDeepLink()">
+                        💬 카카오 T 호출앱 열기 (모바일 앱)
+                    </button>
+                    <button class="btn-large btn-kakaomap" onclick="openKakaoMapLink()">
+                        🗺️ 카카오맵 길찾기 (PC/모바일 웹)
+                    </button>
+                </div>
+            </div>
+
+            <!-- Right Side: Status Details & Log history -->
+            <div class="detail-section">
+                <!-- Latest Location Information Card -->
+                <div class="info-card">
+                    <h3 class="panel-title" style="margin-bottom: 20px;">📍 최신 호출 정보</h3>
+                    
+                    <div class="form-group">
+                        <div class="info-label">📍 출발지 주소 (부모님 현 위치)</div>
+                        <div class="info-value address-highlight" id="lbl-address">대기 중... 위치 수신을 기다리고 있습니다.</div>
+                        <div id="badge-source-container"></div>
+                    </div>
+
+                    <div class="form-group" style="border-top: 1px solid #E2E8F0; padding-top: 12px; margin-top: 12px;">
+                        <div class="info-label">🏁 도착지 주소 (목적지)</div>
+                        <div class="info-value address-highlight" id="lbl-address-dest" style="background: #F0FDF4; border-color: #BBF7D0; color: #166534; font-size: 15px;">대기 중...</div>
+                        <button class="btn btn-secondary" id="btn-copy-dest" style="font-size: 11px; padding: 4px 8px; margin-top: 8px; display: none;" onclick="copyDestinationToClipboard()">📋 목적지 주소 복사</button>
+                    </div>
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: 16px;">
+                        <div>
+                            <div class="info-label">위도 (Latitude)</div>
+                            <div class="info-value" id="lbl-lat">-</div>
+                        </div>
+                        <div>
+                            <div class="info-label">경도 (Longitude)</div>
+                            <div class="info-value" id="lbl-lng">-</div>
+                        </div>
+                    </div>
+
+                    <div style="margin-top: 16px;">
+                        <div class="info-label">위치 확인 수신 시간</div>
+                        <div class="info-value" id="lbl-time">-</div>
+                    </div>
+                </div>
+
+                <!-- Destination Sync Panel (Inline Management) -->
+                <div class="info-card">
+                    <h3 class="panel-title" style="margin-bottom: 12px;">⚙️ 부모님 목적지 동기화 설정</h3>
+                    <div style="font-size: 12px; color: var(--text-child-muted); line-height: 1.4; margin-bottom: 12px;">
+                        자녀가 목적지 주소를 미리 세팅하고 동기화 버튼을 누르면 부모님 스마트폰 화면에 원격으로 실시간 자동 반영됩니다.
+                    </div>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 8px; margin-bottom: 12px;">
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 12px; font-weight: bold; min-width: 56px;">🏠 집:</span>
+                            <input type="text" id="inline-dest-addr-1" class="form-control" style="font-size: 12px; padding: 6px 10px; flex: 1;" placeholder="집 주소 입력">
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 12px; font-weight: bold; min-width: 56px;">👵 복지관:</span>
+                            <input type="text" id="inline-dest-addr-2" class="form-control" style="font-size: 12px; padding: 6px 10px; flex: 1;" placeholder="복지관 주소 입력">
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 12px; font-weight: bold; min-width: 56px;">👧 딸래미집:</span>
+                            <input type="text" id="inline-dest-addr-3" class="form-control" style="font-size: 12px; padding: 6px 10px; flex: 1;" placeholder="딸래미집 주소 입력">
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 12px; font-weight: bold; min-width: 56px;">👦 아들집:</span>
+                            <input type="text" id="inline-dest-addr-4" class="form-control" style="font-size: 12px; padding: 6px 10px; flex: 1;" placeholder="아들집 주소 입력">
+                        </div>
+                        <div style="display: flex; gap: 8px; align-items: center;">
+                            <span style="font-size: 12px; font-weight: bold; min-width: 56px;">🏥 병원:</span>
+                            <input type="text" id="inline-dest-addr-5" class="form-control" style="font-size: 12px; padding: 6px 10px; flex: 1;" placeholder="병원 주소 입력">
+                        </div>
+                    </div>
+                    
+                    <div style="display: flex; gap: 8px; align-items: center; margin-bottom: 12px; border-top: 1px dashed #E2E8F0; padding-top: 12px;">
+                        <span style="font-size: 12px; font-weight: bold; min-width: 56px;">🔗 토픽 ID:</span>
+                        <input type="text" id="inline-bridge-topic" class="form-control" style="font-size: 12px; padding: 6px 10px; flex: 1;" placeholder="무선 브릿지 토픽 ID">
+                    </div>
+
+                    <button class="btn btn-primary" style="width: 100%; padding: 12px; font-size: 13px;" onclick="syncInlineDestinations()">
+                        💾 변경사항 부모님께 동기화
+                    </button>
+                </div>
+
+                <!-- Call History Logs Card -->
+                <div class="info-card" style="flex: 1;">
+                    <h3 class="panel-title" style="margin-bottom: 16px; justify-content: space-between;">
+                        <span>📋 호출 이력 로그</span>
+                        <button class="btn btn-secondary" style="font-size: 11px; padding: 4px 8px;" onclick="clearCallLogs()">비우기</button>
+                    </h3>
+                    
+                    <ul class="log-list" id="log-list-container">
+                        <li style="text-align: center; color: var(--text-child-muted); padding: 20px; font-size:13px;">수신된 이력이 없습니다.</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+       4. DUAL VIEW (SPLIT-SCREEN DEMO)
+       ======================================================== -->
+    <section id="view-dual" class="view-section">
+        <div class="dual-header">
+            <div class="dual-logo">📱↔️💻 안심 귀가 호출 - 통합 시뮬레이션 데모</div>
+            <div style="display: flex; gap: 12px;">
+                <button class="btn btn-secondary" style="background: rgba(255,255,255,0.1); color:white; border:none;" onclick="openSettings()">⚙️ 설정</button>
+                <button class="btn btn-primary" onclick="routeToHome()">메인 화면으로</button>
+            </div>
+        </div>
+        <div class="dual-container">
+            <!-- Left Pane: Parent UI -->
+            <div class="dual-pane" style="background-color: var(--bg-parent);">
+                <span class="dual-pane-label" style="background-color: var(--primary-parent);">부모님 화면 (시니어)</span>
+                <!-- Content Injector / Simulated Parent view inside Dual view -->
+                <div class="parent-content" style="padding-top: 120px;">
+                    <h2 class="parent-instruction">자녀분에게 전화를 걸어<br>데리러 오라고 해볼까요?</h2>
+                    <button class="big-call-btn" id="btn-parent-call-dual" onclick="requestParentCall()">
+                        <span>📢</span>
+                        <span>위치전송</span>
+                    </button>
+                    
+                    <div style="font-size: 13px; font-weight: bold; color: #64748B; margin-top: 15px;">또는 도착지 선택하여 바로 전송하기:</div>
+                    <div id="parent-destinations-container-dual" class="destinations-quick-grid" style="margin: 12px auto;"></div>
+
+                    <button class="big-call-direct-btn" onclick="makeDirectPhoneCall()" style="margin: 12px auto 10px auto; padding: 14px; font-size: 15px; border-radius: 18px;">
+                        <span>📞</span>
+                        <span style="font-size: 13px;">자녀에게 전화해서 위치를 알려주세요</span>
+                    </button>
+
+                    <p class="parent-footer-text" style="margin-top:12px;">
+                        데모 상태입니다. 클릭 시 자녀측에 즉시 위치 정보가 수신됩니다.
+                    </p>
+                </div>
+            </div>
+
+            <!-- Right Pane: Child UI -->
+            <div class="dual-pane" style="background-color: var(--bg-child); color: var(--text-child);">
+                <span class="dual-pane-label" style="background-color: var(--primary-child); color: #0D1117;">자녀 화면 (관제 대시보드)</span>
+                
+                <!-- Simplified Child View to prevent double header issues -->
+                <div class="child-dashboard" style="grid-template-columns: 1fr; padding-top: 80px; gap: 16px;">
+                    <!-- Map Wrapper -->
+                    <div class="map-wrapper" style="height: 300px;">
+                        <div id="kakao-map-container-dual" style="width:100%; height:100%; position:absolute; top:0; left:0;"></div>
+                        <div class="map-fallback" id="map-fallback-overlay-dual">
+                            <div class="map-fallback-icon" style="font-size:32px; margin-bottom:8px;">🗺️</div>
+                            <h4 class="map-fallback-title" style="font-size:15px;">실시간 지도 비활성화됨</h4>
+                            <p class="map-fallback-desc" style="font-size:11px; margin-bottom:12px;">설정창에서 카카오맵 Key를 넣어주세요.</p>
+                        </div>
+                    </div>
+                    
+                    <!-- Details & Copy Panel -->
+                    <div class="info-card" style="padding: 16px;">
+                        <div class="info-label">📍 출발지 주소 (부모님 현 위치)</div>
+                        <div class="info-value address-highlight" id="lbl-address-dual" style="font-size: 15px;">대기 중... 왼쪽 화면에서 위치 보내기를 눌러주세요.</div>
+                        <div id="badge-source-container-dual"></div>
+
+                        <div class="info-label" style="margin-top: 10px;">🏁 도착지 주소 (목적지)</div>
+                        <div class="info-value address-highlight" id="lbl-address-dest-dual" style="font-size: 15px; background: #F0FDF4; border-color: #BBF7D0; color: #166534; margin-bottom: 6px;">대기 중...</div>
+                        
+                        <div style="display: flex; gap: 8px; margin-top: 12px; flex-wrap: wrap;">
+                            <button class="btn btn-primary" style="flex:1; font-size:11px; padding: 8px 2px; min-width: 60px;" onclick="copyAddressToClipboard()">📋 출발 복사</button>
+                            <button class="btn btn-secondary" id="btn-copy-dest-dual" style="flex:1; font-size:11px; padding: 8px 2px; min-width: 60px; display: none;" onclick="copyDestinationToClipboard()">📋 도착 복사</button>
+                            <button class="btn btn-green" style="flex:1; font-size:11px; padding: 8px 2px; min-width: 65px; background: #FEE500; color:#191919;" onclick="openKakaoTDeepLink()">🚖 카카오 T</button>
+                            <button class="btn btn-kakaomap" style="flex:1; font-size:11px; padding: 8px 2px; min-width: 65px;" onclick="openKakaoMapLink()">🗺️ 카카오맵</button>
+                        </div>
+                    </div>
+
+                    <!-- Destination Sync Panel (Inline Management) for Dual View -->
+                    <div class="info-card" style="padding: 16px;">
+                        <h4 class="panel-title" style="font-size: 14px; margin-bottom: 10px;">
+                            <span>⚙️ 목적지 동기화 설정</span>
+                        </h4>
+                        <div style="font-size: 11px; color: var(--text-child-muted); line-height: 1.4; margin-bottom: 10px;">
+                            목적지 주소를 수정하고 동기화 버튼을 누르면 부모님 기기에 원격으로 즉시 갱신됩니다.
+                        </div>
+                        
+                        <div style="display: flex; flex-direction: column; gap: 6px; margin-bottom: 10px;">
+                            <div style="display: flex; gap: 4px; align-items: center;">
+                                <span style="font-size: 11px; font-weight: bold; min-width: 48px;">🏠 집:</span>
+                                <input type="text" id="inline-dest-addr-1-dual" class="form-control" style="font-size: 11px; padding: 4px 6px; flex: 1;" placeholder="주소 입력">
+                            </div>
+                            <div style="display: flex; gap: 4px; align-items: center;">
+                                <span style="font-size: 11px; font-weight: bold; min-width: 48px;">👵 복지관:</span>
+                                <input type="text" id="inline-dest-addr-2-dual" class="form-control" style="font-size: 11px; padding: 4px 6px; flex: 1;" placeholder="주소 입력">
+                            </div>
+                            <div style="display: flex; gap: 4px; align-items: center;">
+                                <span style="font-size: 11px; font-weight: bold; min-width: 48px;">👧 딸래미:</span>
+                                <input type="text" id="inline-dest-addr-3-dual" class="form-control" style="font-size: 11px; padding: 4px 6px; flex: 1;" placeholder="주소 입력">
+                            </div>
+                            <div style="display: flex; gap: 4px; align-items: center;">
+                                <span style="font-size: 11px; font-weight: bold; min-width: 48px;">👦 아들집:</span>
+                                <input type="text" id="inline-dest-addr-4-dual" class="form-control" style="font-size: 11px; padding: 4px 6px; flex: 1;" placeholder="주소 입력">
+                            </div>
+                            <div style="display: flex; gap: 4px; align-items: center;">
+                                <span style="font-size: 11px; font-weight: bold; min-width: 48px;">🏥 병원:</span>
+                                <input type="text" id="inline-dest-addr-5-dual" class="form-control" style="font-size: 11px; padding: 4px 6px; flex: 1;" placeholder="주소 입력">
+                            </div>
+                        </div>
+                        
+                        <div style="display: flex; gap: 6px; align-items: center; margin-bottom: 8px;">
+                            <span style="font-size: 11px; font-weight: bold; min-width: 48px;">🔗 토픽:</span>
+                            <input type="text" id="inline-bridge-topic-dual" class="form-control" style="font-size: 11px; padding: 4px 6px; flex: 1;" placeholder="토픽 ID">
+                        </div>
+
+                        <button class="btn btn-primary" style="width: 100%; font-size: 12px; padding: 8px;" onclick="syncInlineDestinations()">
+                            💾 변경사항 부모님께 동기화
+                        </button>
+                    </div>
+
+                    <!-- Log List -->
+                    <div class="info-card" style="padding: 16px;">
+                        <h4 class="panel-title" style="font-size: 14px; margin-bottom: 10px; justify-content: space-between;">
+                            <span>📋 호출 로그</span>
+                            <button class="btn btn-secondary" style="font-size: 10px; padding: 2px 6px;" onclick="clearCallLogs()">비우기</button>
+                        </h4>
+                        <ul class="log-list" id="log-list-container-dual" style="max-height: 120px;">
+                            <li style="text-align: center; color: var(--text-child-muted); padding: 10px; font-size:12px;">로그가 없습니다.</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Simulated Parent Geolocation Processing Overlay inside Dual View -->
+        <div class="parent-status-overlay" id="parent-status-overlay-dual" style="background: rgba(253, 251, 247, 0.98);">
+            <div class="spinner" id="parent-spinner-dual"></div>
+            <div class="success-checkmark" id="parent-success-icon-dual" style="display:none;">✓</div>
+            <h3 class="status-title" id="parent-status-title-dual">나의 위치를 확인하는 중...</h3>
+            <p class="status-desc" id="parent-status-desc-dual">잠시만 기다려 주세요.</p>
+            <button class="btn btn-secondary" id="btn-parent-cancel-dual-btn" onclick="cancelParentRequest()">취소</button>
+            <button class="btn btn-orange" id="btn-parent-close-dual-btn" style="margin-top: 24px; display: none; width: 80%; padding: 14px; font-size: 16px; font-weight: bold; border-radius: 12px; border: none; cursor: pointer;" onclick="closeParentOverlay()">이전 화면으로</button>
+        </div>
+    </section>
+
+
+    <!-- ========================================================
+       SETTINGS MODAL (GLOBAL)
+       ======================================================== -->
+    <div class="modal-overlay" id="settings-modal">
+        <div class="modal-card">
+            <div class="modal-header">
+                <h3 class="modal-title">⚙️ 브릿지 설정</h3>
+                <button class="btn-circle" style="width:32px; height:32px; font-size:14px;" onclick="closeSettings()">✕</button>
+            </div>
+            <div class="modal-body">
+                <div class="form-group">
+                    <label for="input-api-key">카카오맵 JavaScript API App Key</label>
+                    <input type="text" id="input-api-key" class="form-control" placeholder="Kakao Javascript Key 입력">
+                    <span style="font-size:11px; color:#64748B; margin-top: 4px; display:block; line-height: 1.4;">
+                        카카오 개발자 콘솔에서 발급받은 'JavaScript 키'를 입력해 주세요. (입력 시 지도 자동 활성화)
+                    </span>
+                </div>
+                
+                <div class="form-group">
+                    <label for="input-phone">자녀 전화번호 (비상 연락처)</label>
+                    <input type="tel" id="input-phone" class="form-control" placeholder="예: 01012345678">
+                    <span style="font-size:11px; color:#64748B; margin-top: 4px; display:block;">
+                        위치 공유 실패 시 부모가 터치 한 번으로 전화를 걸 상대방의 연락처입니다.
+                    </span>
+                </div>
+
+                <div class="form-group" style="border-top: 1px solid #E2E8F0; padding-top: 16px;">
+                    <label for="input-bridge-topic">기기 간 실시간 브릿지 연동 토픽 ID</label>
+                    <div style="display: flex; gap: 8px;">
+                        <input type="text" id="input-bridge-topic" class="form-control" placeholder="예: bridge-mobility-1234" style="flex:1;">
+                        <button type="button" class="btn btn-secondary" style="font-size:11px; padding: 6px 10px; border: 1px solid #CBD5E1; cursor: pointer;" onclick="generateRandomTopic()">랜덤 생성</button>
+                    </div>
+                    <span style="font-size:11px; color:#64748B; margin-top: 4px; display:block; line-height: 1.4;">
+                        부모님 폰과 자녀 폰(또는 PC)이 동일한 토픽 ID로 설정되어야 기기 간 무선 실시간 통신이 가능합니다.
+                    </span>
+                </div>
+
+                <div class="form-group" style="border-top: 1px solid #E2E8F0; padding-top: 16px; margin-top: 16px;">
+                    <label style="font-weight: 700; color: #1E293B; margin-bottom: 8px; display: block;">📍 자주 가는 목적지 설정 (시나리오 B)</label>
+                    
+                    <div style="display: flex; flex-direction: column; gap: 12px; margin-bottom: 8px;">
+                        <!-- 목적지 1 -->
+                        <div style="background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                            <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                                <input type="text" id="input-dest-name-1" class="form-control" placeholder="목적지 1 이름 (예: 집)" style="flex: 1; font-size: 13px; padding: 6px 10px;">
+                                <span style="font-size:14px; align-self:center;">🏠</span>
+                            </div>
+                            <input type="text" id="input-dest-addr-1" class="form-control" placeholder="목적지 1 주소 (예: 서울 마포구 백범로 31)" style="font-size: 13px; padding: 6px 10px;">
+                        </div>
+                        
+                        <!-- 목적지 2 -->
+                        <div style="background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                            <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                                <input type="text" id="input-dest-name-2" class="form-control" placeholder="목적지 2 이름 (예: 병원)" style="flex: 1; font-size: 13px; padding: 6px 10px;">
+                                <span style="font-size:14px; align-self:center;">🏥</span>
+                            </div>
+                            <input type="text" id="input-dest-addr-2" class="form-control" placeholder="목적지 2 주소" style="font-size: 13px; padding: 6px 10px;">
+                        </div>
+                        
+                        <!-- 목적지 3 -->
+                        <div style="background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                            <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                                <input type="text" id="input-dest-name-3" class="form-control" placeholder="목적지 3 이름 (예: 복지관)" style="flex: 1; font-size: 13px; padding: 6px 10px;">
+                                <span style="font-size:14px; align-self:center;">👵</span>
+                            </div>
+                            <input type="text" id="input-dest-addr-3" class="form-control" placeholder="목적지 3 주소" style="font-size: 13px; padding: 6px 10px;">
+                        </div>
+
+                        <!-- 목적지 4 -->
+                        <div style="background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                            <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                                <input type="text" id="input-dest-name-4" class="form-control" placeholder="목적지 4 이름 (예: 딸래미집)" style="flex: 1; font-size: 13px; padding: 6px 10px;">
+                                <span style="font-size:14px; align-self:center;">👧</span>
+                            </div>
+                            <input type="text" id="input-dest-addr-4" class="form-control" placeholder="목적지 4 주소" style="font-size: 13px; padding: 6px 10px;">
+                        </div>
+
+                        <!-- 목적지 5 -->
+                        <div style="background: #F8FAFC; padding: 12px; border-radius: 8px; border: 1px solid #E2E8F0;">
+                            <div style="display: flex; gap: 8px; margin-bottom: 6px;">
+                                <input type="text" id="input-dest-name-5" class="form-control" placeholder="목적지 5 이름 (예: 아들집)" style="flex: 1; font-size: 13px; padding: 6px 10px;">
+                                <span style="font-size:14px; align-self:center;">👦</span>
+                            </div>
+                            <input type="text" id="input-dest-addr-5" class="form-control" placeholder="목적지 5 주소" style="font-size: 13px; padding: 6px 10px;">
+                        </div>
+                    </div>
+                    <span style="font-size:11px; color:#64748B; line-height: 1.4; display:block;">
+                        설정한 목적지는 부모님 화면에 대형 원터치 버튼으로 나타나며, 선택하여 간편하게 전송할 수 있습니다.
+                    </span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button class="btn btn-secondary" onclick="closeSettings()">취소</button>
+                <button class="btn btn-primary" onclick="saveSettings()">저장하기</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+       PRE-PERMISSION EXPLAINER MODAL (OS PERMISSION PREPARATION)
+       ======================================================== -->
+    <div class="modal-overlay" id="permission-explainer-modal">
+        <div class="modal-card" style="max-width: 420px;">
+            <div class="modal-body" style="padding-top: 30px;">
+                <div class="explainer-illustration">🗺️📍</div>
+                <h3 class="status-title" style="text-align: center; margin-bottom: 12px;">안전한 주소 탐색 안내</h3>
+                <p class="explainer-text">
+                    자녀분에게 부모님의 정확한 위치를 알려드리기 위해 <b>GPS 위치 수집 권한</b>이 필요합니다.<br><br>
+                    잠시 후 브라우저가 위치 권한을 요구하면 반드시 <b>[허용]</b> 또는 <b>[앱 사용 중에만 허용]</b> 단추를 눌러주시기 바랍니다.
+                </p>
+            </div>
+            <div class="modal-footer" style="justify-content: center; padding-bottom: 30px;">
+                <button class="btn btn-orange btn-large" style="width: 80%;" onclick="dismissExplainerAndRequestGPS()">이해했습니다 (위치 찾기)</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+       GPS FAILURE / CALL MODAL
+       ======================================================== -->
+    <div class="modal-overlay" id="gps-fail-modal">
+        <div class="modal-card" style="max-width: 440px;">
+            <div class="modal-body gps-fail-modal" style="padding: 30px 24px;">
+                <div style="font-size: 54px; margin-bottom: 16px;">⚠️</div>
+                <h3 class="status-title" style="color: var(--danger);">위치 확인 불가</h3>
+                <p class="explainer-text" style="margin-bottom: 20px;">
+                    위성 GPS 권한이 꺼져 있거나 연결에 실패했습니다.<br>
+                    인터넷 기지국(IP) 정보로 <b>대략적인 추정치</b>를 자녀에게 보냈습니다.<br><br>
+                    아래 버튼을 눌러 자녀에게 <b>전화</b>로 정확한 위치(상호명이나 건물명)를 알려주세요.
+                </p>
+                
+                <a href="tel:01000000000" id="btn-tel-link" class="gps-fail-btn-tel">
+                    📞 자녀에게 바로 전화걸기
+                </a>
+            </div>
+            <div class="modal-footer" style="justify-content: center; padding-bottom: 24px;">
+                <button class="btn btn-secondary" onclick="closeGpsFailModal()">닫기</button>
+            </div>
+        </div>
+    </div>
+
+
+    <!-- ========================================================
+       TOAST NOTIFICATION (CHILD SIDE)
+       ======================================================== -->
+    <div class="notification-toast" id="notification-toast">
+        <div style="font-size: 24px;">🚨</div>
+        <div class="toast-body">
+            <div class="toast-title">부모님의 귀가 요청 도착</div>
+            <div class="toast-desc" id="toast-desc-text">부모님의 실시간 위치 정보가 갱신되었습니다.</div>
+        </div>
+        <button class="btn-circle" style="width:24px; height:24px; font-size:10px; border:none; background:rgba(255,255,255,0.1); color:white;" onclick="closeToast()">✕</button>
+    </div>
+
+
+    <!-- ========================================================
+       JAVASCRIPT APP LOGIC
+       ======================================================== -->
+    <script>
+        // State Store
+        const State = {
+            currentView: 'home', // 'home', 'parent', 'child', 'dual'
+            kakaoApiKey: localStorage.getItem('kakao_api_key') || '',
+            childPhone: localStorage.getItem('child_phone') || '',
+            latestLocation: JSON.parse(localStorage.getItem('latest_location')) || null,
+            logs: JSON.parse(localStorage.getItem('call_logs')) || [],
+            map: {
+                parentTab: null,
+                dualTab: null
+            },
+            marker: {
+                parentTab: null,
+                dualTab: null
+            },
+            channel: null,
+            parentWatchId: null,
+            bridgeTopic: localStorage.getItem('bridge_topic') || (() => {
+                const randomNum = Math.floor(1000 + Math.random() * 9000);
+                const defaultTopic = `bridge-mobility-${randomNum}`;
+                localStorage.setItem('bridge_topic', defaultTopic);
+                return defaultTopic;
+            })(),
+            eventSource: null,
+            destinations: JSON.parse(localStorage.getItem('bridge_destinations')) || [
+                { name: '집', address: '서울특별시 마포구 백범로 31' },
+                { name: '복지관', address: '서울특별시 서초구 서초대로 20' },
+                { name: '딸래미집', address: '서울특별시 강남구 역삼로 50' },
+                { name: '아들집', address: '서울특별시 송파구 올림픽로 80' },
+                { name: '병원', address: '서울특별시 종로구 대학로 101' }
+            ]
+        };
+
+        // Initialize App
+        window.addEventListener('DOMContentLoaded', () => {
+            // Restore forms
+            document.getElementById('input-api-key').value = State.kakaoApiKey;
+            document.getElementById('input-phone').value = State.childPhone;
+            
+            // Restore destinations
+            for (let i = 1; i <= 5; i++) {
+                const dest = State.destinations[i - 1] || { name: '', address: '' };
+                document.getElementById(`input-dest-name-${i}`).value = dest.name;
+                document.getElementById(`input-dest-addr-${i}`).value = dest.address;
+            }
+            
+            // Set up communication channel
+            setupBroadcastChannel();
+
+            // Connect to wireless bridge server
+            connectToBridgeServer();
+
+            // Bind inline destination addresses on child dashboards
+            bindInlineDestinations();
+
+            // Load Kakao Maps if API key is present
+            if (State.kakaoApiKey) {
+                loadKakaoMapsScript(State.kakaoApiKey);
+            }
+
+            // Detect routing from hash, default to home
+            const hash = window.location.hash.replace('#', '');
+            if (['home', 'parent', 'child', 'dual'].includes(hash)) {
+                routeTo(hash);
+            } else {
+                routeTo('home');
+            }
+
+            // Restore logs list
+            renderLogs();
+            if (State.latestLocation) {
+                updateChildUI(State.latestLocation, false);
+            }
+
+            // Request Notification Permission on Child page load
+            if (Notification.permission === 'default') {
+                Notification.requestPermission();
+            }
+
+            // Render parent destination buttons
+            renderDestinationButtons();
+        });
+
+        // --------------------------------------------------------
+        // ROUTING SYSTEM
+        // --------------------------------------------------------
+        function routeTo(viewId) {
+            State.currentView = viewId;
+            window.location.hash = viewId;
+
+            // Toggle view visibility
+            document.querySelectorAll('.view-section').forEach(sec => {
+                sec.classList.remove('view-active');
+            });
+
+            const activeSection = document.getElementById(`view-${viewId}`);
+            if (activeSection) {
+                activeSection.classList.add('view-active');
+            }
+
+            // View-specific initializations
+            if (viewId === 'child') {
+                setTimeout(() => {
+                    initKakaoMap('kakao-map-container', 'parentTab');
+                    if (State.latestLocation) {
+                        updateMapLocation(State.latestLocation.lat, State.latestLocation.lng, 'parentTab');
+                    }
+                }, 100);
+            } else if (viewId === 'dual') {
+                setTimeout(() => {
+                    initKakaoMap('kakao-map-container-dual', 'dualTab');
+                    if (State.latestLocation) {
+                        updateMapLocation(State.latestLocation.lat, State.latestLocation.lng, 'dualTab');
+                    }
+                }, 100);
+            }
+        }
+
+        function routeToHome() {
+            routeTo('home');
+        }
+
+        function switchToRole(role) {
+            routeTo(role);
+        }
+
+        // --------------------------------------------------------
+        // SETTINGS DIALOG
+        // --------------------------------------------------------
+        function openSettings() {
+            document.getElementById('settings-modal').style.display = 'flex';
+        }
+
+        function closeSettings() {
+            document.getElementById('settings-modal').style.display = 'none';
+        }
+
+        function saveSettings() {
+            const apiKey = document.getElementById('input-api-key').value.trim();
+            const phone = document.getElementById('input-phone').value.trim();
+            const newTopic = document.getElementById('input-bridge-topic').value.trim();
+
+            const oldApiKey = State.kakaoApiKey;
+            State.kakaoApiKey = apiKey;
+            State.childPhone = phone;
+
+            localStorage.setItem('kakao_api_key', apiKey);
+            localStorage.setItem('child_phone', phone);
+
+            const oldTopic = State.bridgeTopic;
+            if (newTopic) {
+                State.bridgeTopic = newTopic;
+                localStorage.setItem('bridge_topic', newTopic);
+            }
+
+            // Save destinations
+            const newDests = [];
+            for (let i = 1; i <= 5; i++) {
+                const name = document.getElementById(`input-dest-name-${i}`).value.trim();
+                const address = document.getElementById(`input-dest-addr-${i}`).value.trim();
+                if (name && address) {
+                    newDests.push({ name, address });
+                }
+            }
+            State.destinations = newDests;
+            localStorage.setItem('bridge_destinations', JSON.stringify(newDests));
+
+            // Sync other inline forms
+            bindInlineDestinations();
+
+            // Re-render destinations button UI
+            renderDestinationButtons();
+
+            closeSettings();
+
+            // Reconnect SSE if topic changed
+            if (newTopic && newTopic !== oldTopic) {
+                connectToBridgeServer();
+            }
+
+            // Reload Maps if App Key changed
+            if (apiKey && apiKey !== oldApiKey) {
+                alert('카카오맵 API 키가 설정되었습니다. 지도를 로드하기 위해 페이지를 새로고침합니다.');
+                window.location.reload();
+            }
+        }
+
+        // --------------------------------------------------------
+        // BROADCAST CHANNEL (SYNC)
+        // --------------------------------------------------------
+        function setupBroadcastChannel() {
+            try {
+                State.channel = new BroadcastChannel('mobility-bridge-channel');
+                State.channel.onmessage = (event) => {
+                    const msg = event.data;
+                    if (msg && msg.type === 'NEW_CALL') {
+                        handleIncomingCall(msg.payload);
+                    }
+                };
+            } catch (e) {
+                console.warn('BroadcastChannel not supported. Using LocalStorage fallback.', e);
+                window.addEventListener('storage', (e) => {
+                    if (e.key === 'latest_location' && e.newValue) {
+                        handleIncomingCall(JSON.parse(e.newValue));
+                    }
+                });
+            }
+        }
+
+        // --------------------------------------------------------
+        // PARENT MODULE (GPS & SENDING)
+        // --------------------------------------------------------
+        function requestParentCall(destName = '통화 확인 필요', destAddr = '') {
+            console.log("DEBUG_CALL: requestParentCall invoked with destName =", destName, "destAddr =", destAddr);
+            // Save selected destination info
+            State.selectedDestinationName = destName;
+            State.selectedDestinationAddress = destAddr;
+
+            if (destName === '통화 확인 필요') {
+                // First show UI Explainer modal before requesting OS permission
+                document.getElementById('permission-explainer-modal').style.display = 'flex';
+            } else {
+                // Bypasses GPS Explainer/Spinner, sends preset destination directly
+                sendDestinationOnlyDirectly(destName, destAddr);
+            }
+        }
+
+        async function sendDestinationOnlyDirectly(destName, destAddr) {
+            const prefix = State.currentView === 'dual' ? '-dual' : '';
+            
+            // Re-use last known location if available, otherwise fall back to Seoul Center
+            const lat = State.latestLocation ? State.latestLocation.lat : 37.5665;
+            const lng = State.latestLocation ? State.latestLocation.lng : 126.9780;
+            const fallbackAddr = State.latestLocation ? State.latestLocation.address : '부모 현 위치 (통화 확인 필요)';
+            
+            const payload = {
+                id: Date.now(),
+                lat: lat,
+                lng: lng,
+                isIP: false,
+                city: '',
+                address: fallbackAddr,
+                destinationName: destName,
+                destinationAddress: destAddr,
+                timestamp: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+
+            // Save locally
+            localStorage.setItem('latest_location', JSON.stringify(payload));
+            State.latestLocation = payload;
+
+            // Add to logs
+            saveLog(payload);
+
+            // Broadcast to other tabs
+            if (State.channel) {
+                State.channel.postMessage({ type: 'NEW_CALL', payload: payload });
+            }
+
+            // Sync dual view directly if active
+            if (State.currentView === 'dual') {
+                handleIncomingCall(payload);
+            }
+
+            // Broadcast via ntfy.sh (wireless bridge)
+            if (State.bridgeTopic) {
+                try {
+                    fetch(`https://ntfy.sh/${State.bridgeTopic}`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            type: 'NEW_CALL',
+                            payload: payload
+                        })
+                    }).then(res => {
+                        if (!res.ok) console.warn('ntfy.sh post failed', res.statusText);
+                    }).catch(e => console.error('ntfy.sh post error', e));
+                } catch(e) {
+                    console.error('Failed to post NEW_CALL to ntfy.sh', e);
+                }
+            }
+
+            // Show direct success overlay without spinner
+            document.getElementById(`parent-status-overlay${prefix}`).style.display = 'flex';
+            document.getElementById(`parent-spinner${prefix}`).style.display = 'none';
+            document.getElementById(`parent-success-icon${prefix}`).style.display = 'flex';
+            document.getElementById(`parent-status-title${prefix}`).innerText = '목적지 전송 완료!';
+            document.getElementById(`parent-status-desc${prefix}`).innerHTML = 
+                `자녀에게 <b>[${destName}]</b>(으)로 가고 싶다는 목적지가 안전하게 전송되었습니다.`;
+
+            // Toggle cancel button to close button directly
+            const cancelBtn = document.getElementById(prefix ? 'btn-parent-cancel-dual-btn' : 'btn-parent-cancel');
+            const closeBtn = document.getElementById(prefix ? 'btn-parent-close-dual-btn' : 'btn-parent-close');
+            
+            if (cancelBtn) cancelBtn.style.display = 'none';
+            if (closeBtn) closeBtn.style.display = 'inline-block';
+        }
+
+        function dismissExplainerAndRequestGPS() {
+            document.getElementById('permission-explainer-modal').style.display = 'none';
+            
+            // Show status overlay (spinner)
+            const prefix = State.currentView === 'dual' ? '-dual' : '';
+            document.getElementById(`parent-status-overlay${prefix}`).style.display = 'flex';
+            document.getElementById(`parent-spinner${prefix}`).style.display = 'block';
+            document.getElementById(`parent-success-icon${prefix}`).style.display = 'none';
+            document.getElementById(`parent-status-title${prefix}`).innerText = '나의 위치를 확인하는 중...';
+            document.getElementById(`parent-status-desc${prefix}`).innerText = '자녀에게 전송하기 위해 GPS 위성을 수신 중입니다.';
+            document.getElementById(`btn-parent-cancel${prefix}-btn` || `btn-parent-cancel`).style.display = 'inline-block';
+            document.getElementById(`btn-parent-close${prefix}-btn` || `btn-parent-close`).style.display = 'none';
+
+            if ("geolocation" in navigator) {
+                // Try high-accuracy Geolocation
+                navigator.geolocation.getCurrentPosition(
+                    (position) => {
+                        const lat = position.coords.latitude;
+                        const lng = position.coords.longitude;
+                        sendLocationToBridge(lat, lng, false);
+                    },
+                    (error) => {
+                        console.warn("Geolocation failed. Attempting IP Geolocation fallback...", error);
+                        fetchIPLocationFallback();
+                    },
+                    { enableHighAccuracy: true, timeout: 8000, maximumAge: 0 }
+                );
+            } else {
+                fetchIPLocationFallback();
+            }
+        }
+
+        // IP Geolocation fallback
+        async function fetchIPLocationFallback() {
+            const prefix = State.currentView === 'dual' ? '-dual' : '';
+            document.getElementById(`parent-status-title${prefix}`).innerText = '위성 GPS 연결 실패';
+            document.getElementById(`parent-status-desc${prefix}`).innerText = '대안으로 네트워크 기지국 위치를 찾는 중입니다...';
+
+            try {
+                // Fetch public IP location (using ipapi.co or ip-api.com)
+                const response = await fetch('https://ipapi.co/json/');
+                if (!response.ok) throw new Error('IP API network error');
+                const data = await response.json();
+                
+                if (data.latitude && data.longitude) {
+                    sendLocationToBridge(data.latitude, data.longitude, true, data.city);
+                } else {
+                    throw new Error('Invalid coordinates in IP response');
+                }
+            } catch (err) {
+                console.error("IP fallback failed.", err);
+                // Hardcode Seoul coordinates if everything fails
+                sendLocationToBridge(37.5665, 126.9780, true, "서울");
+            }
+        }
+
+        // Build location packet and broadcast it
+        async function sendLocationToBridge(lat, lng, isIP, city = '') {
+            const prefix = State.currentView === 'dual' ? '-dual' : '';
+            
+            // Get local address using Nominatim immediately as background details
+            let displayAddress = '주소 변환 중...';
+            try {
+                displayAddress = await getNominatimAddress(lat, lng);
+            } catch(e) {
+                displayAddress = `위도: ${lat.toFixed(5)}, 경도: ${lng.toFixed(5)}`;
+            }
+
+            const payload = {
+                id: Date.now(),
+                lat: lat,
+                lng: lng,
+                isIP: isIP,
+                city: city,
+                address: displayAddress,
+                destinationName: State.selectedDestinationName || '통화 확인 필요',
+                destinationAddress: State.selectedDestinationAddress || '',
+                timestamp: new Date().toLocaleTimeString('ko-KR', { hour: '2-digit', minute: '2-digit', second: '2-digit' })
+            };
+
+            // Save locally
+            localStorage.setItem('latest_location', JSON.stringify(payload));
+            State.latestLocation = payload;
+
+            // Add to logs
+            saveLog(payload);
+
+            // Broadcast to other tabs
+            if (State.channel) {
+                State.channel.postMessage({ type: 'NEW_CALL', payload: payload });
+            }
+
+            // Sync dual view directly if active
+            if (State.currentView === 'dual') {
+                handleIncomingCall(payload);
+            }
+
+            // Broadcast via ntfy.sh (wireless bridge)
+            if (State.bridgeTopic) {
+                try {
+                    fetch(`https://ntfy.sh/${State.bridgeTopic}`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            type: 'NEW_CALL',
+                            payload: payload
+                        })
+                    }).then(res => {
+                        if (!res.ok) console.warn('ntfy.sh post failed', res.statusText);
+                    }).catch(e => console.error('ntfy.sh post error', e));
+                } catch(e) {
+                    console.error('Failed to post NEW_CALL to ntfy.sh', e);
+                }
+            }
+
+            // Update Parent UI to Success
+            document.getElementById(`parent-spinner${prefix}`).style.display = 'none';
+            document.getElementById(`parent-success-icon${prefix}`).style.display = 'flex';
+            document.getElementById(`parent-status-title${prefix}`).innerText = '위치 전송 완료!';
+            
+            if (isIP) {
+                document.getElementById(`parent-status-desc${prefix}`).innerHTML = 
+                    `인터넷 기지국 기반 위치로 자녀에게 전송되었습니다.<br><b style="color:var(--danger);">정확한 위치를 설명하기 위해 꼭 전화를 걸어주세요.</b>`;
+                
+                // Show Call trigger modal
+                setTimeout(() => {
+                    openGpsFailModal();
+                }, 1200);
+            } else {
+                document.getElementById(`parent-status-desc${prefix}`).innerText = 
+                    '자녀에게 부모님의 실시간 위치를 안전하게 전송했습니다.';
+            }
+
+            // Toggle cancel button to close button directly
+            const cancelBtn = document.getElementById(prefix ? 'btn-parent-cancel-dual-btn' : 'btn-parent-cancel');
+            const closeBtn = document.getElementById(prefix ? 'btn-parent-close-dual-btn' : 'btn-parent-close');
+            
+            if (cancelBtn) cancelBtn.style.display = 'none';
+            if (closeBtn) closeBtn.style.display = 'inline-block';
+        }
+
+        function cancelParentRequest() {
+            closeParentOverlay();
+        }
+
+        function closeParentOverlay() {
+            const prefix = State.currentView === 'dual' ? '-dual' : '';
+            document.getElementById(`parent-status-overlay${prefix}`).style.display = 'none';
+
+            // Reset overlay button visibility
+            const cancelBtn = document.getElementById(prefix ? 'btn-parent-cancel-dual-btn' : 'btn-parent-cancel');
+            const closeBtn = document.getElementById(prefix ? 'btn-parent-close-dual-btn' : 'btn-parent-close');
+            
+            if (cancelBtn) cancelBtn.style.display = 'inline-block';
+            if (closeBtn) closeBtn.style.display = 'none';
+        }
+
+        // Render destination buttons in parent view
+        function renderDestinationButtons() {
+            const containers = [
+                { id: 'parent-destinations-container', isDual: false },
+                { id: 'parent-destinations-container-dual', isDual: true }
+            ];
+
+            containers.forEach(item => {
+                const container = document.getElementById(item.id);
+                if (!container) return;
+
+                if (!State.destinations || State.destinations.length === 0) {
+                    container.innerHTML = `<span style="font-size:12px; color:#94A3B8;">설정창에서 목적지를 등록해 보세요.</span>`;
+                    return;
+                }
+
+                container.innerHTML = State.destinations.map((dest, index) => {
+                    // Match icons visually based on common names
+                    let icon = '📍';
+                    if (dest.name.includes('딸') || dest.name.includes('녀')) icon = '👧';
+                    else if (dest.name.includes('아들') || dest.name.includes('남')) icon = '👦';
+                    else if (dest.name.includes('집')) icon = '🏠';
+                    else if (dest.name.includes('병원') || dest.name.includes('약국') || dest.name.includes('의원')) icon = '🏥';
+                    else if (dest.name.includes('복지') || dest.name.includes('센터') || dest.name.includes('회관') || dest.name.includes('교') || dest.name.includes('실버')) icon = '👵';
+                    else if (index === 0) icon = '🏠';
+                    else if (index === 1) icon = '👵';
+                    else if (index === 2) icon = '👧';
+                    else if (index === 3) icon = '👦';
+                    else if (index === 4) icon = '🏥';
+
+                    return `
+                        <button class="btn-dest-quick" onclick="requestParentCall('${dest.name}', '${dest.address}')">
+                            <span class="icon">${icon}</span>
+                            <span style="font-size: 13px;">${dest.name}으로</span>
+                        </button>
+                    `;
+                }).join('');
+            });
+            console.log("DEBUG_RENDER: destinations =", JSON.stringify(State.destinations));
+            const btn = document.querySelector('#parent-destinations-container-dual .btn-dest-quick');
+            if (btn) console.log("DEBUG_RENDER: first button HTML =", btn.outerHTML);
+        }
+
+        // Make phone call directly to child's number
+        function makeDirectPhoneCall() {
+            const phoneNum = State.childPhone || '010-0000-0000';
+            window.location.href = `tel:${phoneNum}`;
+        }
+
+        // GPS Fail modal setup
+        function openGpsFailModal() {
+            const phoneNum = State.childPhone || '010-0000-0000';
+            const telLink = document.getElementById('btn-tel-link');
+            telLink.href = `tel:${phoneNum}`;
+            telLink.innerHTML = `📞 자녀에게 바로 전화걸기<br><span style="font-size:12px; font-weight:normal;">(${phoneNum})</span>`;
+            document.getElementById('gps-fail-modal').style.display = 'flex';
+        }
+
+        function closeGpsFailModal() {
+            document.getElementById('gps-fail-modal').style.display = 'none';
+            closeParentOverlay();
+        }
+
+        // --------------------------------------------------------
+        // CHILD MODULE (DASHBOARD LOGIC)
+        // --------------------------------------------------------
+        function handleIncomingCall(payload) {
+            State.latestLocation = payload;
+            
+            // Play Chord Alert sound
+            playBridgeAlertChord();
+
+            // Trigger System Notification
+            triggerBrowserNotification(payload);
+
+            // Trigger child toast
+            showChildToast(payload.isIP);
+
+            // Update UI elements
+            updateChildUI(payload, true);
+        }
+
+        function updateChildUI(payload, runGeocoder = true) {
+            const prefix = State.currentView === 'dual' ? '-dual' : '';
+            
+            // Update labels
+            const lblAddress = document.getElementById(`lbl-address${prefix}`);
+            const lblLat = document.getElementById(`lbl-lat${prefix}` || `lbl-lat`);
+            const lblLng = document.getElementById(`lbl-lng${prefix}` || `lbl-lng`);
+            const lblTime = document.getElementById(`lbl-time${prefix}` || `lbl-time`);
+            const badgeContainer = document.getElementById(`badge-source-container${prefix}`);
+
+            if (lblAddress) lblAddress.innerText = payload.address;
+            if (lblLat) lblLat.innerText = payload.lat.toFixed(6);
+            if (lblLng) lblLng.innerText = payload.lng.toFixed(6);
+            if (lblTime) lblTime.innerText = payload.timestamp;
+
+            // Bind destination info
+            const lblAddressDest = document.getElementById(`lbl-address-dest${prefix}`);
+            const btnCopyDest = document.getElementById(`btn-copy-dest${prefix}`);
+            
+            if (lblAddressDest) {
+                if (payload.destinationName && payload.destinationName !== '통화 확인 필요') {
+                    lblAddressDest.innerText = `${payload.destinationName} (${payload.destinationAddress})`;
+                    if (btnCopyDest) btnCopyDest.style.display = 'inline-block';
+                } else {
+                    lblAddressDest.innerText = '📞 통화로 도착지 확인 필요';
+                    if (btnCopyDest) btnCopyDest.style.display = 'none';
+                }
+            }
+
+            // Setup Badge
+            if (badgeContainer) {
+                if (payload.isIP) {
+                    badgeContainer.innerHTML = `<span class="source-badge source-ip">⚠️ 대략적 기지국 위치 (오차 있음)</span>`;
+                } else {
+                    badgeContainer.innerHTML = `<span class="source-badge source-gps">✓ 정밀 위성 GPS 위치</span>`;
+                }
+            }
+
+            // Sync Map Marker
+            const mapKey = State.currentView === 'dual' ? 'dualTab' : 'parentTab';
+            updateMapLocation(payload.lat, payload.lng, mapKey);
+
+            // Request Kakao Geocoding address if Key available
+            if (runGeocoder && State.kakaoApiKey && window.kakao && window.kakao.maps && window.kakao.maps.services) {
+                reverseGeocodeKakao(payload.lat, payload.lng, (addr) => {
+                    if (addr) {
+                        payload.address = addr;
+                        if (lblAddress) lblAddress.innerText = addr;
+                        // update log
+                        updateLogAddress(payload.id, addr);
+                    }
+                });
+            }
+
+            renderLogs();
+        }
+
+        // Toast display utility
+        function showToast(title, desc, borderStyle = 'var(--primary-child)') {
+            const toast = document.getElementById('notification-toast');
+            const toastTitle = toast.querySelector('.toast-title');
+            const toastDesc = document.getElementById('toast-desc-text');
+            
+            if (toastTitle) toastTitle.innerText = title;
+            if (toastDesc) toastDesc.innerText = desc;
+            toast.style.borderLeftColor = borderStyle;
+            
+            toast.style.display = 'flex';
+            setTimeout(() => {
+                toast.style.opacity = '1';
+            }, 50);
+
+            if (window.toastTimeout) clearTimeout(window.toastTimeout);
+            window.toastTimeout = setTimeout(() => {
+                closeToast();
+            }, 6000);
+        }
+
+        function showChildToast(isIP) {
+            const title = '부모님의 귀가 요청 도착';
+            const desc = isIP 
+                ? '부모님으로부터 위치 전송 실패(기지국 대체) 및 전화 요망 알림이 왔습니다!' 
+                : '부모님의 실시간 위성 GPS 좌표가 갱신되었습니다.';
+            const border = isIP ? 'var(--warning)' : 'var(--primary-child)';
+            showToast(title, desc, border);
+        }
+
+        function closeToast() {
+            const toast = document.getElementById('notification-toast');
+            toast.style.opacity = '0';
+            setTimeout(() => {
+                toast.style.display = 'none';
+            }, 300);
+        }
+
+        // --------------------------------------------------------
+        // WIRELESS BRIDGE (ntfy.sh SSE & HTTP POST)
+        // --------------------------------------------------------
+        function connectToBridgeServer() {
+            if (State.eventSource) {
+                State.eventSource.close();
+                State.eventSource = null;
+            }
+
+            if (!State.bridgeTopic) return;
+
+            console.log(`Connecting to ntfy.sh SSE: ${State.bridgeTopic}`);
+            const sseUrl = `https://ntfy.sh/${State.bridgeTopic}/sse`;
+            
+            State.eventSource = new EventSource(sseUrl);
+            
+            State.eventSource.onopen = () => {
+                console.log(`Successfully connected to bridge topic: ${State.bridgeTopic}`);
+            };
+
+            State.eventSource.onmessage = (event) => {
+                try {
+                    const data = JSON.parse(event.data);
+                    if (data.event === 'message') {
+                        handleBridgeMessage(data.message);
+                    }
+                } catch (e) {
+                    console.error('Error parsing SSE event data:', e);
+                }
+            };
+
+            State.eventSource.onerror = (error) => {
+                console.error('EventSource failed, closing connection.', error);
+                if (State.eventSource) {
+                    State.eventSource.close();
+                    State.eventSource = null;
+                }
+                // Retry after 5 seconds
+                setTimeout(connectToBridgeServer, 5000);
+            };
+        }
+
+        function handleBridgeMessage(msgStr) {
+            try {
+                const data = JSON.parse(msgStr);
+                if (!data || !data.type) return;
+
+                console.log('Received bridge message:', data);
+
+                if (data.type === 'NEW_CALL') {
+                    if (State.latestLocation && State.latestLocation.id === data.payload.id) {
+                        return; // Skip duplicate
+                    }
+                    handleIncomingCall(data.payload);
+                } else if (data.type === 'CONFIG_SYNC') {
+                    if (data.destinations) {
+                        State.destinations = data.destinations;
+                        localStorage.setItem('bridge_destinations', JSON.stringify(data.destinations));
+                        
+                        // Sync inputs in configuration modal
+                        for (let i = 1; i <= 5; i++) {
+                            const dest = State.destinations[i - 1] || { name: '', address: '' };
+                            const nameInput = document.getElementById(`input-dest-name-${i}`);
+                            const addrInput = document.getElementById(`input-dest-addr-${i}`);
+                            if (nameInput) nameInput.value = dest.name;
+                            if (addrInput) addrInput.value = dest.address;
+                        }
+
+                        // Re-render quick buttons and update inline inputs
+                        renderDestinationButtons();
+                        bindInlineDestinations();
+                    }
+                    
+                    if (data.childPhone) {
+                        State.childPhone = data.childPhone;
+                        localStorage.setItem('child_phone', data.childPhone);
+                        const phoneInput = document.getElementById('input-phone');
+                        if (phoneInput) phoneInput.value = data.childPhone;
+                    }
+                    
+                    showToast('⚙️ 설정 동기화 완료', '자녀분 대시보드로부터 목적지가 실시간 업데이트되었습니다.', 'var(--success)');
+                }
+            } catch(e) {
+                console.error('Error handling bridge message:', e);
+            }
+        }
+
+        function bindInlineDestinations() {
+            for (let i = 1; i <= 5; i++) {
+                const dest = State.destinations[i - 1] || { name: '', address: '' };
+                
+                const inlineInput = document.getElementById(`inline-dest-addr-${i}`);
+                if (inlineInput) inlineInput.value = dest.address;
+
+                const inlineInputDual = document.getElementById(`inline-dest-addr-${i}-dual`);
+                if (inlineInputDual) inlineInputDual.value = dest.address;
+            }
+            
+            const topicInput = document.getElementById('inline-bridge-topic');
+            if (topicInput) topicInput.value = State.bridgeTopic;
+
+            const topicInputDual = document.getElementById('inline-bridge-topic-dual');
+            if (topicInputDual) topicInputDual.value = State.bridgeTopic;
+            
+            const settingsTopicInput = document.getElementById('input-bridge-topic');
+            if (settingsTopicInput) settingsTopicInput.value = State.bridgeTopic;
+        }
+
+        async function syncInlineDestinations() {
+            const isDual = State.currentView === 'dual';
+            const suffix = isDual ? '-dual' : '';
+            
+            const topicInput = document.getElementById(`inline-bridge-topic${suffix}`);
+            const newTopic = topicInput ? topicInput.value.trim() : '';
+            const oldTopic = State.bridgeTopic;
+            if (newTopic) {
+                State.bridgeTopic = newTopic;
+                localStorage.setItem('bridge_topic', newTopic);
+            }
+            
+            const updatedDests = [...State.destinations];
+            for (let i = 1; i <= 5; i++) {
+                const inlineInput = document.getElementById(`inline-dest-addr-${i}${suffix}`);
+                if (inlineInput) {
+                    const addressVal = inlineInput.value.trim();
+                    if (updatedDests[i - 1]) {
+                        updatedDests[i - 1].address = addressVal;
+                    } else {
+                        const defaultNames = ['집', '복지관', '딸래미집', '아들집', '병원'];
+                        updatedDests.push({
+                            name: defaultNames[i - 1] || `목적지 ${i}`,
+                            address: addressVal
+                        });
+                    }
+                }
+            }
+            
+            State.destinations = updatedDests;
+            localStorage.setItem('bridge_destinations', JSON.stringify(State.destinations));
+            
+            bindInlineDestinations();
+            renderDestinationButtons();
+            
+            if (newTopic && newTopic !== oldTopic) {
+                connectToBridgeServer();
+            }
+            
+            if (State.bridgeTopic) {
+                try {
+                    const response = await fetch(`https://ntfy.sh/${State.bridgeTopic}`, {
+                        method: 'POST',
+                        body: JSON.stringify({
+                            type: 'CONFIG_SYNC',
+                            destinations: State.destinations,
+                            childPhone: State.childPhone
+                        })
+                    });
+                    
+                    if (response.ok) {
+                        alert('📢 부모님 기기로 목적지 설정이 무선 동기화되었습니다!');
+                    } else {
+                        throw new Error('Server response not ok');
+                    }
+                } catch (err) {
+                    console.error('ntfy.sh sync failed:', err);
+                    alert('⚠️ 무선 브릿지 전송에 실패했습니다. 인터넷 연결 및 토픽 ID를 확인해 주세요.');
+                }
+            } else {
+                alert('⚠️ 토픽 ID가 설정되어 있지 않습니다.');
+            }
+        }
+
+        function generateRandomTopic() {
+            const randomNum = Math.floor(1000 + Math.random() * 9000);
+            const topic = `bridge-mobility-${randomNum}`;
+            const inputField = document.getElementById('input-bridge-topic');
+            if (inputField) {
+                inputField.value = topic;
+            }
+        }
+
+        // Clipboard action
+        function copyAddressToClipboard() {
+            if (!State.latestLocation) {
+                alert('복사할 위치 정보가 없습니다.');
+                return;
+            }
+            const addr = State.latestLocation.address;
+            navigator.clipboard.writeText(addr).then(() => {
+                alert(`📋 부모님 주소가 복사되었습니다:\n"${addr}"`);
+            }).catch(err => {
+                console.error('클립보드 복사 실패: ', err);
+                alert('주소 복사에 실패했습니다. 수동으로 복사해 주세요.');
+            });
+        }
+
+        // Copy destination address
+        function copyDestinationToClipboard() {
+            if (!State.latestLocation || !State.latestLocation.destinationAddress) {
+                alert('복사할 도착지 위치 정보가 없습니다.');
+                return;
+            }
+            const addr = State.latestLocation.destinationAddress;
+            navigator.clipboard.writeText(addr).then(() => {
+                alert(`🏁 도착지(목적지) 주소가 복사되었습니다:\n"${addr}"`);
+            }).catch(err => {
+                console.error('클립보드 복사 실패: ', err);
+                alert('주소 복사에 실패했습니다. 수동으로 복사해 주세요.');
+            });
+        }
+
+        // Kakao T link launcher
+        function openKakaoTDeepLink() {
+            const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+            const isMobile = /Android|webOS|iPhone|iPad|iPod|BlackBerry|IEMobile|Opera Mini/i.test(userAgent);
+
+            if (isMobile) {
+                const appScheme = 'kakaot://';
+                const start = Date.now();
+                window.location.href = appScheme;
+
+                setTimeout(() => {
+                    if (Date.now() - start < 1500) {
+                        // Mobile scheme failed to fire within timeout, redirect to corresponding App Store
+                        const isiOS = /iPhone|iPad|iPod/i.test(userAgent);
+                        const storeLink = isiOS 
+                            ? 'https://apps.apple.com/kr/app/%EC%B9%B4%EC%B9%B4%EC%98%A4-t-%ED%83%9D%EC%8B%9C-%EC%84%B8%EC%B0%A8-%EC%A3%BC%EC%B0%A8-%EB%B0%94%EC%9D%B4%ED%81%AC-%ED%95%AD%EA%B3%B5-%ED%80%B5/id981110422'
+                            : 'https://play.google.com/store/apps/details?id=com.kakao.taxi';
+                        window.open(storeLink, '_blank');
+                    }
+                }, 1000);
+            } else {
+                // PC / Desktop fallback
+                alert('카카오 T는 스마트폰(모바일) 전용 앱 서비스입니다.\n\n화면의 부모님 주소를 복사한 뒤, 본인의 스마트폰 카카오 T 앱에 입력하여 대리 호출을 완료해 주세요.');
+                window.open('https://www.kakaomobility.com/service-kakaot', '_blank');
+            }
+        }
+
+        // Kakao Map Web Link Launcher (PC/Mobile compatible)
+        function openKakaoMapLink() {
+            if (!State.latestLocation) {
+                alert('연동할 위치 정보가 없습니다. 부모님 화면에서 먼저 위치를 전송해 주세요.');
+                return;
+            }
+            const lat = State.latestLocation.lat;
+            const lng = State.latestLocation.lng;
+            const address = State.latestLocation.address || '부모님 위치';
+            const destAddr = State.latestLocation.destinationAddress;
+            
+            if (destAddr) {
+                // Route directions
+                const mapUrl = `https://map.kakao.com/?sName=${encodeURIComponent(address)}&eName=${encodeURIComponent(destAddr)}`;
+                window.open(mapUrl, '_blank');
+            } else {
+                // Search fallback
+                const mapUrl = `https://map.kakao.com/link/to/${encodeURIComponent(address)},${lat},${lng}`;
+                window.open(mapUrl, '_blank');
+            }
+        }
+
+        // Web Notification API
+        function triggerBrowserNotification(payload) {
+            if (Notification.permission === 'granted') {
+                const title = "🚨 안심 귀가 호출 도착!";
+                const options = {
+                    body: payload.isIP 
+                        ? `부모님의 위치가 전송되었습니다. GPS 권한 이상으로 대략적인 위치 정보(IP)이오니 전화를 확인해 주십시오.` 
+                        : `부모님의 실시간 상세 위치(${payload.address})가 수신되었습니다.`,
+                    icon: 'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" fill="%23FF6B35"/><text x="50" y="65" font-size="45" text-anchor="middle" fill="white">📢</text></svg>'
+                };
+                new Notification(title, options);
+            }
+        }
+
+        // Web Audio API chord alert
+        function playBridgeAlertChord() {
+            try {
+                const audioCtx = new (window.AudioContext || window.webkitAudioContext)();
+                
+                const playTone = (freq, start, duration) => {
+                    const osc = audioCtx.createOscillator();
+                    const gain = audioCtx.createGain();
+                    osc.connect(gain);
+                    gain.connect(audioCtx.destination);
+                    osc.frequency.setValueAtTime(freq, audioCtx.currentTime + start);
+                    gain.gain.setValueAtTime(0.2, audioCtx.currentTime + start);
+                    gain.gain.exponentialRampToValueAtTime(0.001, audioCtx.currentTime + start + duration);
+                    osc.start(audioCtx.currentTime + start);
+                    osc.stop(audioCtx.currentTime + start + duration);
+                };
+                
+                // Play arpeggio chord (C5 -> E5 -> G5)
+                playTone(523.25, 0, 0.2);     // C5
+                playTone(659.25, 0.15, 0.2);  // E5
+                playTone(783.99, 0.3, 0.5);   // G5
+            } catch (e) {
+                console.warn("Web Audio API not allowed or supported by browser policy", e);
+            }
+        }
+
+        // Local Geocoder using OpenStreetMap (Nominatim) for background parsing
+        async function getNominatimAddress(lat, lng) {
+            const url = `https://nominatim.openstreetmap.org/reverse?format=json&lat=${lat}&lon=${lng}&zoom=18&addressdetails=1`;
+            const response = await fetch(url, {
+                headers: {
+                    'Accept-Language': 'ko-KR,ko;q=0.9'
+                }
+            });
+            if (!response.ok) throw new Error('Nominatim geocode failed');
+            const data = await response.json();
+            
+            // Build custom Korean address format if Nominatim returns detailed objects
+            if (data.address) {
+                const city = data.address.city || data.address.province || data.address.town || '';
+                const road = data.address.road || '';
+                const house = data.address.house_number || '';
+                const name = data.address.amenity || data.address.building || '';
+                
+                let result = `${city} ${road} ${house}`.trim();
+                if (name) result += ` (${name})`;
+                return result || data.display_name;
+            }
+            return data.display_name || `${lat.toFixed(5)}, ${lng.toFixed(5)}`;
+        }
+
+        // Kakao Geocoder callback wrapper
+        function reverseGeocodeKakao(lat, lng, callback) {
+            if (!window.kakao || !window.kakao.maps || !window.kakao.maps.services) {
+                callback(null);
+                return;
+            }
+            const geocoder = new kakao.maps.services.Geocoder();
+            const coord = new kakao.maps.LatLng(lat, lng);
+            geocoder.coord2Address(coord.getLng(), coord.getLat(), (result, status) => {
+                if (status === kakao.maps.services.Status.OK) {
+                    const address = result[0].road_address 
+                        ? result[0].road_address.address_name 
+                        : result[0].address.address_name;
+                    callback(address);
+                } else {
+                    callback(null);
+                }
+            });
+        }
+
+        // Simulate a location send from child dashboard for easy development testing
+        function simulateIncomingLocation() {
+            // Random coordinate around central Seoul
+            const randomLat = 37.5665 + (Math.random() - 0.5) * 0.01;
+            const randomLng = 126.9780 + (Math.random() - 0.5) * 0.01;
+            const isIP = Math.random() > 0.7; // 30% chance of being IP fallback
+            
+            sendLocationToBridge(randomLat, randomLng, isIP, "서울 시뮬레이터");
+        }
+
+        // --------------------------------------------------------
+        // LOGS DATABASE MANAGEMENT
+        // --------------------------------------------------------
+        function saveLog(packet) {
+            State.logs.unshift(packet);
+            if (State.logs.length > 20) { // Limit logs to last 20
+                State.logs.pop();
+            }
+            localStorage.setItem('call_logs', JSON.stringify(State.logs));
+            renderLogs();
+        }
+
+        function updateLogAddress(id, address) {
+            State.logs = State.logs.map(log => {
+                if (log.id === id) {
+                    log.address = address;
+                }
+                return log;
+            });
+            localStorage.setItem('call_logs', JSON.stringify(State.logs));
+            renderLogs();
+        }
+
+        function renderLogs() {
+            const prefix = State.currentView === 'dual' ? '-dual' : '';
+            const container = document.getElementById(`log-list-container${prefix}`);
+            if (!container) return;
+
+            if (State.logs.length === 0) {
+                container.innerHTML = `<li style="text-align: center; color: var(--text-child-muted); padding: 20px; font-size:13px;">수신된 이력이 없습니다.</li>`;
+                return;
+            }
+
+            container.innerHTML = State.logs.map(log => {
+                const activeClass = (State.latestLocation && State.latestLocation.id === log.id) ? 'active' : '';
+                const typeText = log.isIP ? '⚠️ 기지국(대략)' : '✓ GPS(정밀)';
+                const typeStyle = log.isIP ? 'color: var(--warning); font-weight:700;' : 'color: var(--success);';
+                
+                return `
+                    <li class="log-item ${activeClass}" onclick="selectLogItem(${log.id})">
+                        <div>
+                            <span style="font-weight:600; display:block;">${log.address}</span>
+                            <span style="${typeStyle} font-size:11px;">${typeText}</span>
+                        </div>
+                        <span class="log-time">${log.timestamp}</span>
+                    </li>
+                `;
+            }).join('');
+        }
+
+        function selectLogItem(id) {
+            const selected = State.logs.find(log => log.id === id);
+            if (selected) {
+                State.latestLocation = selected;
+                updateChildUI(selected, false);
+            }
+        }
+
+        function clearCallLogs() {
+            if (confirm('모든 호출 기록을 지우시겠습니까?')) {
+                State.logs = [];
+                localStorage.removeItem('call_logs');
+                renderLogs();
+            }
+        }
+
+        // --------------------------------------------------------
+        // KAKAO MAPS INTEGRATION
+        // --------------------------------------------------------
+        function loadKakaoMapsScript(appKey) {
+            if (window.kakao && window.kakao.maps) return;
+            const script = document.createElement('script');
+            script.src = `https://dapi.kakao.com/v2/maps/sdk.js?appkey=${appKey}&libraries=services&autoload=false`;
+            script.onload = () => {
+                kakao.maps.load(() => {
+                    console.log('Kakao Maps API loaded successfully.');
+                    
+                    // Hide placeholders
+                    const cover = document.getElementById('map-fallback-overlay');
+                    const coverDual = document.getElementById('map-fallback-overlay-dual');
+                    if (cover) cover.style.display = 'none';
+                    if (coverDual) coverDual.style.display = 'none';
+                    
+                    // Initialize if view is ready
+                    if (State.currentView === 'child') {
+                        initKakaoMap('kakao-map-container', 'parentTab');
+                    } else if (State.currentView === 'dual') {
+                        initKakaoMap('kakao-map-container-dual', 'dualTab');
+                    }
+                });
+            };
+            document.head.appendChild(script);
+        }
+
+        function initKakaoMap(containerId, mapKey) {
+            if (!window.kakao || !window.kakao.maps) return;
+            
+            const container = document.getElementById(containerId);
+            if (!container) return;
+
+            const defaultLat = State.latestLocation ? State.latestLocation.lat : 37.5665;
+            const defaultLng = State.latestLocation ? State.latestLocation.lng : 126.9780;
+            const center = new kakao.maps.LatLng(defaultLat, defaultLng);
+
+            const options = {
+                center: center,
+                level: 3
+            };
+
+            const map = new kakao.maps.Map(container, options);
+            
+            // Create custom Marker
+            const marker = new kakao.maps.Marker({
+                position: center,
+                map: map
+            });
+
+            State.map[mapKey] = map;
+            State.marker[mapKey] = marker;
+            
+            // Relayout map since it could be hidden initially
+            setTimeout(() => {
+                map.relayout();
+                map.setCenter(center);
+            }, 200);
+        }
+
+        function updateMapLocation(lat, lng, mapKey) {
+            if (!window.kakao || !window.kakao.maps) return;
+            
+            const map = State.map[mapKey];
+            const marker = State.marker[mapKey];
+
+            if (map && marker) {
+                const moveLatLng = new kakao.maps.LatLng(lat, lng);
+                marker.setPosition(moveLatLng);
+                map.setCenter(moveLatLng);
+            }
+        }
+    </script>
+</body>
+</html>
